@@ -1,0 +1,15 @@
+# Single source of truth file
+SOURCE_OF_TRUTH.md
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
+
+# Node / Dependency Directories
+node_modules/
+dist/
+build/
+.npm/

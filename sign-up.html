@@ -1,0 +1,492 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Create an Account | Stackly Real Estate Platform</title>
+    <meta
+      name="description"
+      content="Register an account with Stackly to shortlist verified luxury properties, list real estate, or access professional broker tools."
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="assets/images/stackly-logo.webp" />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/auth.css" />
+  </head>
+  <body class="auth-page">
+    <!-- Minimal Fixed Header (No standard Navbar per requirements) -->
+    <header class="auth-header">
+      <a href="index.html" aria-label="Stackly Home">
+        <img
+          src="assets/images/stackly-logo.webp"
+          alt="Stackly"
+          class="auth-logo-img"
+          width="130"
+          height="42"
+        />
+      </a>
+      <div style="display: flex; align-items: center; gap: 1rem">
+        <a href="index.html" class="auth-back-link">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          <span>Back to Home</span>
+        </a>
+        <a href="sign-in.html" class="btn btn-outline btn-sm">Sign In</a>
+      </div>
+    </header>
+
+    <!-- Split Screen Auth Wrapper -->
+    <div class="auth-wrapper">
+      <!-- Left Column: Brand Benefits, Features & Product Overview -->
+      <div class="auth-brand-side">
+        <div class="auth-brand-content">
+          <span class="auth-tagline-badge">Join 2,400+ Homeowners</span>
+          <h1 class="auth-brand-title">
+            Create Your Exclusive <br /><span>Stackly Account</span>
+          </h1>
+          <p class="auth-brand-desc">
+            Gain unrestricted access to South India's verified property
+            database, private off-market listings, and algorithmic price
+            benchmarking.
+          </p>
+
+          <div class="auth-features-list">
+            <div class="auth-feature-item">
+              <div class="auth-feature-icon">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
+              </div>
+              <div class="auth-feature-text">
+                <h5>Certified Title Dossiers</h5>
+                <p>
+                  Download legal scrutiny reports and DTCP/RERA approvals
+                  directly.
+                </p>
+              </div>
+            </div>
+
+            <div class="auth-feature-item">
+              <div class="auth-feature-icon">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <circle cx="12" cy="12" r="10" />
+                  <path d="M16 8l-8 8M8 8l8 8" />
+                </svg>
+              </div>
+              <div class="auth-feature-text">
+                <h5>Zero Brokerage on Direct Builder Projects</h5>
+                <p>
+                  Keep your hard-earned capital where it belongs with 100%
+                  transparent pricing.
+                </p>
+              </div>
+            </div>
+
+            <div class="auth-feature-item">
+              <div class="auth-feature-icon">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                >
+                  <rect x="3" y="4" width="18" height="18" rx="2" />
+                  <line x1="16" y1="2" x2="16" y2="6" />
+                  <line x1="8" y1="2" x2="8" y2="6" />
+                  <line x1="3" y1="10" x2="21" y2="10" />
+                </svg>
+              </div>
+              <div class="auth-feature-text">
+                <h5>VIP Site Visit Appointments</h5>
+                <p>
+                  Request dedicated vehicle pickups and private viewings at your
+                  convenience.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="auth-quote-box">
+          <p class="auth-quote-text">
+            "The registration and search process on Stackly is cleaner and more
+            professional than any national property portal."
+          </p>
+          <div class="auth-quote-author">
+            <img
+              src="assets/images/agents/agent-4.webp"
+              alt="Suresh Narayanan"
+              class="auth-quote-avatar"
+              width="40"
+              height="40"
+            />
+            <div class="auth-quote-info">
+              <strong>Suresh Narayanan</strong>
+              <span>Salem Property Investor</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Registration Form -->
+      <div class="auth-form-side">
+        <div class="auth-form-box">
+          <div class="auth-form-header">
+            <h2 class="auth-form-title">Create Account</h2>
+            <p class="auth-form-subtitle">
+              Already registered? <a href="sign-in.html">Sign In Here</a>
+            </p>
+          </div>
+
+          <form id="signup-form" class="auth-form" novalidate>
+            <!-- Names Row -->
+            <div
+              style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem"
+            >
+              <div class="form-group">
+                <label for="signup-first-name" class="form-label">
+                  <span>First Name</span><span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="signup-first-name"
+                  class="form-input"
+                  placeholder="e.g. Anand"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-last-name" class="form-label">
+                  <span>Last Name</span><span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="signup-last-name"
+                  class="form-input"
+                  placeholder="e.g. Krishnan"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Username & Email Row -->
+            <div
+              style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 1rem"
+            >
+              <div class="form-group">
+                <label for="signup-username" class="form-label">
+                  <span>Username</span><span class="required">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="signup-username"
+                  class="form-input"
+                  placeholder="anandk"
+                  required
+                />
+              </div>
+              <div class="form-group">
+                <label for="signup-email" class="form-label">
+                  <span>Email Address</span><span class="required">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="signup-email"
+                  class="form-input"
+                  placeholder="anand@example.com"
+                  autocomplete="email"
+                  required
+                />
+              </div>
+            </div>
+
+            <!-- Password with Strength Meter & Toggle -->
+            <div class="form-group">
+              <label for="signup-password" class="form-label">
+                <span>Password</span><span class="required">*</span>
+              </label>
+              <div class="password-input-wrap">
+                <input
+                  type="password"
+                  id="signup-password"
+                  class="form-input"
+                  placeholder="Create strong password"
+                  autocomplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="password-toggle-btn"
+                  aria-label="Toggle password visibility"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </button>
+              </div>
+
+              <!-- Real-time Strength Meter -->
+              <div class="password-strength-wrap">
+                <div class="strength-label">
+                  <span>Password Strength</span>
+                  <span id="strength-label-text">None</span>
+                </div>
+                <div class="strength-bar-bg">
+                  <div class="strength-bar-fill" id="strength-bar-fill"></div>
+                </div>
+                <div class="password-rules-list">
+                  <div class="rule-item" id="rule-length">
+                    <span>•</span> At least 8 characters
+                  </div>
+                  <div class="rule-item" id="rule-upper">
+                    <span>•</span> One uppercase letter
+                  </div>
+                  <div class="rule-item" id="rule-lower">
+                    <span>•</span> One lowercase letter
+                  </div>
+                  <div class="rule-item" id="rule-number">
+                    <span>•</span> One number (0-9)
+                  </div>
+                  <div
+                    class="rule-item"
+                    id="rule-special"
+                    style="grid-column: 1 / -1"
+                  >
+                    <span>•</span> One special character (!@#$%^&*)
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Confirm Password -->
+            <div class="form-group">
+              <label for="signup-confirm-password" class="form-label">
+                <span>Confirm Password</span><span class="required">*</span>
+              </label>
+              <div class="password-input-wrap">
+                <input
+                  type="password"
+                  id="signup-confirm-password"
+                  class="form-input"
+                  placeholder="Repeat your password"
+                  autocomplete="new-password"
+                  required
+                />
+                <button
+                  type="button"
+                  class="password-toggle-btn"
+                  aria-label="Toggle confirm password visibility"
+                >
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Role Selector & Split Mobile Phone Input -->
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1.1fr 1.3fr;
+                gap: 1rem;
+              "
+            >
+              <div class="form-group">
+                <label for="signup-role" class="form-label">
+                  <span>Role / Register As</span><span class="required">*</span>
+                </label>
+                <select id="signup-role" class="form-select" required>
+                  <option value="">Choose role...</option>
+                  <option value="Buyer">Buyer / Homeowner</option>
+                  <option value="Seller">Property Seller</option>
+                  <option value="Agent">Realtor / Broker</option>
+                  <option value="Manager">Property Manager</option>
+                  <option value="Admin">Administrator</option>
+                </select>
+              </div>
+
+              <!-- Split Mobile Phone Input -->
+              <div class="form-group">
+                <label for="signup-phone" class="form-label">
+                  <span>Mobile Number</span><span class="required">*</span>
+                </label>
+                <div class="phone-input-group">
+                  <select id="signup-country-code" class="form-select">
+                    <option value="+91" selected>+91 (IN)</option>
+                    <option value="+1">+1 (US)</option>
+                    <option value="+44">+44 (UK)</option>
+                    <option value="+971">+971 (UAE)</option>
+                    <option value="+65">+65 (SG)</option>
+                  </select>
+                  <input
+                    type="tel"
+                    id="signup-phone"
+                    class="form-input"
+                    placeholder="9876543210"
+                    required
+                  />
+                </div>
+              </div>
+            </div>
+
+            <!-- Address / Locality (Optional) -->
+            <div class="form-group">
+              <label for="signup-address" class="form-label">
+                <span>Primary Locality / City (Optional)</span>
+              </label>
+              <input
+                type="text"
+                id="signup-address"
+                class="form-input"
+                placeholder="e.g. Chinna Thirupathi, Salem"
+              />
+            </div>
+
+            <!-- Mandatory Terms & Conditions Checkbox -->
+            <div class="form-group">
+              <label class="form-check">
+                <input type="checkbox" id="signup-terms" required />
+                <span
+                  >I agree to the
+                  <a href="404.html" class="action-404">Terms of Use</a> and
+                  <a href="404.html" class="action-404">Privacy Policy</a>.<span
+                    class="required"
+                    >*</span
+                  ></span
+                >
+              </label>
+            </div>
+
+            <!-- Optional Newsletter Checkbox -->
+            <div class="form-group">
+              <label class="form-check">
+                <input type="checkbox" id="signup-newsletter" />
+                <span
+                  >I would like to receive market updates and property
+                  announcements.
+                  <a
+                    href="404.html"
+                    class="action-404"
+                    style="font-size: 0.8125rem"
+                    >Read More</a
+                  ></span
+                >
+              </label>
+            </div>
+
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary btn-block btn-lg"
+              style="margin-top: 0.5rem"
+            >
+              Create Account & Continue
+            </button>
+
+            <!-- Social Signup Divider -->
+            <div class="auth-divider">
+              <span>Or register with</span>
+            </div>
+
+            <!-- Social Buttons (redirect to 404 per requirements) -->
+            <div class="social-auth-grid">
+              <a href="404.html" class="social-btn action-404" title="Google"
+                ><svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm3.9 11.5h-3.9v-2.3h6.3a5.5 5.5 0 0 1 .1 1.1 5.9 5.9 0 0 1-6.4 6 6 6 0 1 1 0-12 5.9 5.9 0 0 1 4.2 1.7l-1.8 1.8A3.4 3.4 0 0 0 12 8.6a3.6 3.6 0 0 0 0 7.2 3.3 3.3 0 0 0 3.9-2.3z"
+                  /></svg
+              ></a>
+              <a href="404.html" class="social-btn action-404" title="Microsoft"
+                ><svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M1 1h10v10H1zm12 0h10v10H13zM1 13h10v10H1zm12 0h10v10H13z"
+                  /></svg
+              ></a>
+              <a href="404.html" class="social-btn action-404" title="LinkedIn"
+                ><svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6zM2 9h4v12H2z"
+                  />
+                  <circle cx="4" cy="4" r="2" /></svg
+              ></a>
+              <a href="404.html" class="social-btn action-404" title="Twitter X"
+                ><svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path
+                    d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"
+                  /></svg
+              ></a>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <script src="assets/js/store.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/auth.js"></script>
+  </body>
+</html>

@@ -1,0 +1,722 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Properties Explorer | Stackly Real Estate</title>
+    <meta
+      name="description"
+      content="Browse verified luxury villas, residential plots, and commercial properties in Salem, Chennai, and Coimbatore. Filter by price, bedrooms, and location."
+    />
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/webp" href="assets/images/stackly-logo.webp" />
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="assets/css/main.css" />
+    <link rel="stylesheet" href="assets/css/components.css" />
+  </head>
+  <body>
+    <!-- Full Viewport Loader -->
+    <div id="stackly-loader" role="status" aria-live="polite">
+      <div class="loader-inner">
+        <div class="loader-logo-wrap">
+          <img
+            src="assets/images/stackly-logo.webp"
+            alt="Stackly Logo"
+            width="160"
+            height="52"
+          />
+        </div>
+        <div class="loader-spinner" aria-hidden="true"></div>
+        <div class="loader-text">Loading <span>Properties</span>...</div>
+      </div>
+    </div>
+
+    <!-- Top Bar -->
+    <div class="top-bar">
+      <div class="container top-bar-inner">
+        <div class="top-bar-left">
+          <div class="top-greeting">
+            <svg
+              width="15"
+              height="15"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="5" />
+              <line x1="12" y1="1" x2="12" y2="3" />
+              <line x1="12" y1="21" x2="12" y2="23" />
+              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
+              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
+              <line x1="1" y1="12" x2="3" y2="12" />
+              <line x1="21" y1="12" x2="23" y2="12" />
+              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
+              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
+            </svg>
+            <span class="dynamic-greeting">Welcome to Stackly</span>
+          </div>
+          <div class="top-bar-item">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+              <circle cx="12" cy="10" r="3" />
+            </svg>
+            <span>MMR Complex, Chinna Thirupathi, Salem</span>
+          </div>
+        </div>
+        <div class="top-bar-right">
+          <a href="tel:+919876543210" class="top-bar-item">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+              />
+            </svg>
+            <span>+91 9876543210</span>
+          </a>
+          <a href="mailto:hello@thestackly.com" class="top-bar-item">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <path
+                d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"
+              />
+              <polyline points="22,6 12,13 2,6" />
+            </svg>
+            <span>hello@thestackly.com</span>
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Sticky Header -->
+    <header class="main-header">
+      <div class="container">
+        <div class="header-navbar">
+          <a
+            href="index.html"
+            class="brand-logo-link"
+            aria-label="Stackly Home"
+          >
+            <img
+              src="assets/images/stackly-logo.webp"
+              alt="Stackly"
+              class="brand-logo-img"
+              width="130"
+              height="42"
+            />
+          </a>
+          <nav class="desktop-nav" aria-label="Primary Navigation">
+            <div class="nav-item">
+              <a href="index.html" class="nav-link">Home</a>
+            </div>
+            <div class="nav-item">
+              <a href="properties.html" class="nav-link active">
+                <span>Properties</span>
+                <svg
+                  width="12"
+                  height="12"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <polyline points="6 9 12 15 18 9" />
+                </svg>
+              </a>
+              <div class="nav-dropdown">
+                <a href="properties.html?status=sale" class="dropdown-link"
+                  >Properties For Sale</a
+                >
+                <a href="properties.html?status=rent" class="dropdown-link"
+                  >Luxury Rentals</a
+                >
+                <a href="properties.html?type=Villa" class="dropdown-link"
+                  >Gated Villas</a
+                >
+              </div>
+            </div>
+            <div class="nav-item">
+              <a href="about.html" class="nav-link">About Us</a>
+            </div>
+            <div class="nav-item">
+              <a href="services.html" class="nav-link">Services</a>
+            </div>
+            <div class="nav-item">
+              <a href="pricing.html" class="nav-link">Pricing</a>
+            </div>
+            <div class="nav-item">
+              <a href="contact.html" class="nav-link">Contact</a>
+            </div>
+          </nav>
+          <div class="header-actions">
+            <a href="sign-in.html" class="btn btn-outline btn-sm">Sign In</a>
+            <a href="sign-up.html" class="btn btn-primary btn-sm">Register</a>
+            <button class="hamburger-btn" aria-label="Toggle mobile menu">
+              <span></span><span></span><span></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Mobile Drawer -->
+    <div class="mobile-nav-drawer" role="dialog" aria-modal="true">
+      <div class="mobile-drawer-header">
+        <img
+          src="assets/images/stackly-logo.webp"
+          alt="Stackly"
+          class="footer-logo-img"
+          width="120"
+          height="38"
+        />
+        <button class="mobile-close-btn" aria-label="Close menu">✕</button>
+      </div>
+      <div class="mobile-menu-list">
+        <a href="index.html" class="mobile-nav-link">Home</a>
+        <a href="properties.html" class="mobile-nav-link active"
+          >Properties Catalogue</a
+        >
+        <a href="about.html" class="mobile-nav-link">About Stackly</a>
+        <a href="services.html" class="mobile-nav-link">Advisory & Services</a>
+        <a href="pricing.html" class="mobile-nav-link">Pricing Packages</a>
+        <a href="contact.html" class="mobile-nav-link">Contact Office</a>
+        <a href="dashboard.html" class="mobile-nav-link">Dashboard Portal</a>
+      </div>
+      <div class="mobile-drawer-footer">
+        <a
+          href="sign-in.html"
+          class="btn btn-outline btn-block"
+          style="color: #fff; border-color: rgba(255, 255, 255, 0.3)"
+          >Sign In</a
+        >
+        <a href="sign-up.html" class="btn btn-primary btn-block"
+          >Create Free Account</a
+        >
+      </div>
+    </div>
+
+    <main id="main-content">
+      <!-- Section 1: Hero & Breadcrumb -->
+      <section class="page-hero">
+        <div class="page-hero-overlay"></div>
+        <div class="container">
+          <div class="breadcrumbs">
+            <a href="index.html">Home</a>
+            <span>/</span>
+            <span class="current">Properties Explorer</span>
+          </div>
+          <h1 class="page-hero-title">Exclusive Real Estate Portfolio</h1>
+          <p style="color: #cbd5e1; max-width: 620px; font-size: 1.05rem">
+            Explore verified luxury properties across Salem, Chennai, and
+            Coimbatore. Filter instantly by architecture, locality, and price
+            range.
+          </p>
+        </div>
+      </section>
+
+      <!-- Section 2: Interactive Filter Toolbar -->
+      <section
+        style="
+          background: var(--color-surface);
+          border-bottom: 1px solid var(--color-border);
+          padding: 1.5rem 0;
+          position: sticky;
+          top: 84px;
+          z-index: 30;
+          box-shadow: var(--shadow-sm);
+        "
+      >
+        <div class="container">
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 1.2fr auto;
+              gap: 1rem;
+              align-items: center;
+            "
+          >
+            <div>
+              <input
+                type="text"
+                id="filter-keyword"
+                class="form-input"
+                placeholder="Search title, street or locality..."
+              />
+            </div>
+            <div>
+              <select id="filter-type" class="form-select">
+                <option value="all">All Types</option>
+                <option value="Villa">Villa</option>
+                <option value="House">House</option>
+                <option value="Apartment">Apartment</option>
+                <option value="Commercial">Commercial</option>
+              </select>
+            </div>
+            <div>
+              <select id="filter-status" class="form-select">
+                <option value="all">All Status</option>
+                <option value="sale">For Sale</option>
+                <option value="rent">For Rent</option>
+              </select>
+            </div>
+            <div>
+              <select id="filter-city" class="form-select">
+                <option value="all">All Cities</option>
+                <option value="Salem">Salem</option>
+                <option value="Chennai">Chennai</option>
+                <option value="Coimbatore">Coimbatore</option>
+                <option value="Bangalore">Bangalore</option>
+              </select>
+            </div>
+            <div>
+              <select id="filter-sort" class="form-select">
+                <option value="featured">Featured First</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="beds-desc">Bedrooms: High to Low</option>
+              </select>
+            </div>
+            <div>
+              <button
+                id="filter-reset-btn"
+                class="btn btn-ghost"
+                title="Reset Filters"
+                style="font-size: 0.8125rem"
+              >
+                Reset
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 3: Live Filterable Property Grid -->
+      <section class="section section-bg-light">
+        <div class="container">
+          <div
+            style="
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+              margin-bottom: 2rem;
+            "
+          >
+            <h2
+              id="properties-count"
+              style="
+                font-size: 1.15rem;
+                font-weight: 700;
+                color: var(--color-dark);
+              "
+            >
+              Loading properties...
+            </h2>
+            <span style="font-size: 0.8125rem; color: #557800; font-weight: 600"
+              >✓ 100% RERA Verified Inventory</span
+            >
+          </div>
+
+          <!-- Dynamic properties injected by properties.js -->
+          <div class="grid-3" id="properties-grid"></div>
+        </div>
+      </section>
+
+      <!-- Section 4: Featured Spotlight Estate -->
+      <section class="section">
+        <div class="container">
+          <div
+            class="grid-2"
+            style="
+              background: var(--color-dark);
+              border-radius: var(--radius-lg);
+              overflow: hidden;
+              color: #ffffff;
+              align-items: center;
+            "
+          >
+            <div style="padding: 3.5rem">
+              <span
+                class="section-subtitle"
+                style="
+                  background: rgba(146, 200, 0, 0.2);
+                  color: var(--color-primary);
+                  border: 1px solid rgba(146, 200, 0, 0.4);
+                "
+              >
+                Estate Spotlight of the Month
+              </span>
+              <h2
+                style="
+                  font-size: 2.2rem;
+                  font-weight: 700;
+                  color: #ffffff;
+                  margin: 1rem 0 1rem 0;
+                "
+              >
+                Lakeview Palms Waterfront Villa
+              </h2>
+              <div
+                style="
+                  font-size: 1.75rem;
+                  font-weight: 800;
+                  color: var(--color-primary);
+                  margin-bottom: 1.25rem;
+                "
+              >
+                ₹3.40 Cr
+              </div>
+              <p
+                style="color: #cbd5e1; line-height: 1.7; margin-bottom: 1.75rem"
+              >
+                Perched on the serene Mookaneri Lake promenade in Salem, this
+                6,200 sqft architectural marvel features private jetty access,
+                Italian teakwood ceilings, infinity lap pool, and solar
+                autonomy.
+              </p>
+              <div
+                style="
+                  display: flex;
+                  gap: 1.5rem;
+                  margin-bottom: 2rem;
+                  font-size: 0.9rem;
+                  color: #94a3b8;
+                "
+              >
+                <div><strong>6</strong> Bedrooms</div>
+                <div><strong>6</strong> Bathrooms</div>
+                <div><strong>4</strong> Car Garages</div>
+                <div><strong>Private</strong> Lake Deck</div>
+              </div>
+              <div style="display: flex; gap: 1rem; flex-wrap: wrap">
+                <a
+                  href="contact.html?property=Lakeview%20Palms%20Waterfront%20Estate"
+                  class="btn btn-primary"
+                  >Schedule Private Tour</a
+                >
+                <a
+                  href="tel:+919876543210"
+                  class="btn btn-dark"
+                  style="border: 1px solid rgba(255, 255, 255, 0.2)"
+                  >Call Lead Broker</a
+                >
+              </div>
+            </div>
+            <div style="height: 100%; min-height: 400px">
+              <img
+                src="assets/images/properties/property-5.webp"
+                alt="Lakeview Palms"
+                style="width: 100%; height: 100%; object-fit: cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 5: Interactive Mortgage / EMI Calculator -->
+      <section class="section section-bg-light">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-subtitle">Financial Planning</span>
+            <h2 class="section-title">Interactive EMI Mortgage Calculator</h2>
+            <p class="section-desc">
+              Estimate your monthly home loan installments with real-time
+              interest and down payment calibration.
+            </p>
+          </div>
+
+          <div class="calculator-card">
+            <div class="calc-grid">
+              <div>
+                <div class="calc-control-group">
+                  <div class="calc-label-row">
+                    <span>Property Price</span>
+                    <strong id="calc-price-val">₹1,85,00,000</strong>
+                  </div>
+                  <input
+                    type="range"
+                    id="calc-price"
+                    class="calc-slider"
+                    min="2000000"
+                    max="50000000"
+                    step="500000"
+                    value="18500000"
+                  />
+                </div>
+
+                <div class="calc-control-group">
+                  <div class="calc-label-row">
+                    <span>Down Payment (%)</span>
+                    <strong id="calc-down-val">20% (₹37,00,000)</strong>
+                  </div>
+                  <input
+                    type="range"
+                    id="calc-down"
+                    class="calc-slider"
+                    min="10"
+                    max="50"
+                    step="5"
+                    value="20"
+                  />
+                </div>
+
+                <div class="calc-control-group">
+                  <div class="calc-label-row">
+                    <span>Annual Interest Rate (%)</span>
+                    <strong id="calc-rate-val">8.5%</strong>
+                  </div>
+                  <input
+                    type="range"
+                    id="calc-rate"
+                    class="calc-slider"
+                    min="6.5"
+                    max="12.5"
+                    step="0.25"
+                    value="8.5"
+                  />
+                </div>
+
+                <div class="calc-control-group">
+                  <div class="calc-label-row">
+                    <span>Loan Tenure</span>
+                    <strong id="calc-term-val">20 Years</strong>
+                  </div>
+                  <input
+                    type="range"
+                    id="calc-term"
+                    class="calc-slider"
+                    min="5"
+                    max="30"
+                    step="1"
+                    value="20"
+                  />
+                </div>
+              </div>
+
+              <div class="calc-result-box">
+                <span
+                  style="
+                    font-size: 0.8125rem;
+                    text-transform: uppercase;
+                    letter-spacing: 0.1em;
+                    color: #94a3b8;
+                  "
+                  >Estimated Monthly EMI</span
+                >
+                <div class="calc-emi-amount" id="calc-monthly-emi">
+                  ₹1,28,450 / mo
+                </div>
+                <div class="calc-breakdown">
+                  <div class="calc-breakdown-row">
+                    <span>Total Principal Loan:</span>
+                    <strong id="calc-total-loan">₹1,48,00,000</strong>
+                  </div>
+                  <div class="calc-breakdown-row">
+                    <span>Total Estimated Interest:</span>
+                    <strong id="calc-total-interest">₹1,60,28,000</strong>
+                  </div>
+                </div>
+                <a
+                  href="contact.html?subject=Pre-Approval%20Assistance"
+                  class="btn btn-primary btn-block"
+                  style="margin-top: 1.5rem"
+                  >Apply for Bank Pre-Approval</a
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Section 6: Concierge & Custom Site Viewing CTA -->
+      <section
+        class="section"
+        style="
+          background: linear-gradient(
+            135deg,
+            var(--color-dark),
+            var(--color-dark-secondary)
+          );
+          color: #ffffff;
+          text-align: center;
+        "
+      >
+        <div class="container" style="max-width: 750px">
+          <span
+            class="section-subtitle"
+            style="
+              background: rgba(146, 200, 0, 0.2);
+              color: var(--color-primary);
+              border: 1px solid rgba(146, 200, 0, 0.4);
+            "
+          >
+            Custom Property Concierge
+          </span>
+          <h2
+            style="
+              font-size: clamp(2rem, 3.5vw, 2.75rem);
+              font-weight: 700;
+              color: #ffffff;
+              margin: 1rem 0 1rem 0;
+            "
+          >
+            Cannot Find Your Exact Dream Architecture?
+          </h2>
+          <p
+            style="
+              color: #94a3b8;
+              font-size: 1.05rem;
+              line-height: 1.7;
+              margin-bottom: 2rem;
+            "
+          >
+            Our private off-market desk represents over 60+ unadvertised private
+            estates and premium land parcels across Salem and Tamil Nadu.
+          </p>
+          <div
+            style="
+              display: flex;
+              justify-content: center;
+              gap: 1rem;
+              flex-wrap: wrap;
+            "
+          >
+            <a href="contact.html" class="btn btn-primary btn-lg"
+              >Submit Requirement Brief</a
+            >
+            <a
+              href="tel:+919876543210"
+              class="btn btn-outline btn-lg"
+              style="color: #fff; border-color: rgba(255, 255, 255, 0.4)"
+              >Speak with Private Broker</a
+            >
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <!-- Global Footer -->
+    <footer class="main-footer">
+      <div class="container">
+        <div class="footer-top">
+          <div class="footer-brand">
+            <a href="index.html"
+              ><img
+                src="assets/images/stackly-logo.webp"
+                alt="Stackly"
+                class="footer-logo-img"
+                width="130"
+                height="42"
+            /></a>
+            <p>
+              Stackly connects discerning buyers with verified luxury
+              properties, guaranteed clear titles, and digital transparency.
+            </p>
+          </div>
+          <div>
+            <h4 class="footer-col-title">Properties</h4>
+            <ul class="footer-links">
+              <li>
+                <a href="properties.html?type=Villa" class="footer-link"
+                  >Salem Luxury Villas</a
+                >
+              </li>
+              <li>
+                <a href="properties.html?type=Apartment" class="footer-link"
+                  >Chennai Penthouses</a
+                >
+              </li>
+              <li>
+                <a href="properties.html?type=Commercial" class="footer-link"
+                  >Commercial Parks</a
+                >
+              </li>
+              <li>
+                <a href="properties.html?status=rent" class="footer-link"
+                  >Exclusive Rentals</a
+                >
+              </li>
+            </ul>
+          </div>
+          <div>
+            <h4 class="footer-col-title">Salem Office</h4>
+            <div class="footer-contact-item">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>MMR Complex, Chinna Thirupathi, Salem 636008</span>
+            </div>
+            <div class="footer-contact-item">
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+              >
+                <path
+                  d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
+                />
+              </svg>
+              <span>+91 9876543210</span>
+            </div>
+          </div>
+          <div>
+            <h4 class="footer-col-title">Newsletter</h4>
+            <form class="footer-newsletter-form">
+              <div class="newsletter-input-group">
+                <input
+                  type="email"
+                  class="newsletter-input"
+                  placeholder="Your email..."
+                  required
+                />
+                <button type="submit" class="newsletter-btn">Subscribe</button>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="footer-bottom">
+          <div>© 2026 Stackly Real Estate Network. All rights reserved.</div>
+          <div class="footer-bottom-links">
+            <a href="404.html" class="action-404">Privacy Policy</a>
+            <a href="404.html" class="action-404">Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script src="assets/js/store.js"></script>
+    <script src="assets/js/main.js"></script>
+    <script src="assets/js/properties.js"></script>
+  </body>
+</html>
