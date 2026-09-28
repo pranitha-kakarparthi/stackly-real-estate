@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="page-404-fixed">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -16,7 +16,7 @@
     <link rel="stylesheet" href="assets/css/main.css" />
     <link rel="stylesheet" href="assets/css/components.css" />
   </head>
-  <body>
+  <body class="page-404-fixed" style="height: 100vh; height: 100dvh; max-height: 100vh; overflow: hidden; display: flex; flex-direction: column; margin: 0;">
     <!-- Full Viewport Loader -->
     <div id="stackly-loader" role="status" aria-live="polite">
       <div class="loader-inner">
@@ -30,66 +30,6 @@
         </div>
         <div class="loader-spinner" aria-hidden="true"></div>
         <div class="loader-text">Locating <span>Sanctuary</span>...</div>
-      </div>
-    </div>
-
-    <!-- Top Bar -->
-    <div class="top-bar">
-      <div class="container top-bar-inner">
-        <div class="top-bar-left">
-          <div class="top-greeting">
-            <svg
-              width="15"
-              height="15"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <circle cx="12" cy="12" r="5" />
-              <line x1="12" y1="1" x2="12" y2="3" />
-              <line x1="12" y1="21" x2="12" y2="23" />
-              <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" />
-              <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" />
-              <line x1="1" y1="12" x2="3" y2="12" />
-              <line x1="21" y1="12" x2="23" y2="12" />
-              <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" />
-              <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" />
-            </svg>
-            <span class="dynamic-greeting">Welcome to Stackly</span>
-          </div>
-          <div class="top-bar-item">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-              <circle cx="12" cy="10" r="3" />
-            </svg>
-            <span>MMR Complex, Chinna Thirupathi, Salem</span>
-          </div>
-        </div>
-        <div class="top-bar-right">
-          <a href="tel:+919876543210" class="top-bar-item">
-            <svg
-              width="14"
-              height="14"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-            >
-              <path
-                d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"
-              />
-            </svg>
-            <span>+91 9876543210</span>
-          </a>
-        </div>
       </div>
     </div>
 
@@ -138,220 +78,35 @@
       </div>
     </header>
 
-    <main id="main-content">
-      <section
-        class="section"
-        style="
-          padding: 6rem 0;
-          min-height: 70vh;
-          display: flex;
-          align-items: center;
-        "
-      >
-        <div class="container" style="text-align: center; max-width: 720px">
-          <!-- Large Branded 404 Visual -->
-          <div
-            style="
-              font-size: clamp(6rem, 12vw, 9rem);
-              font-weight: 800;
-              color: var(--color-primary);
-              line-height: 1;
-              letter-spacing: -0.04em;
-              margin-bottom: 0.5rem;
-              text-shadow: 0 10px 25px rgba(146, 200, 0, 0.25);
-            "
-          >
-            404
-          </div>
-
-          <h1
-            style="
-              font-size: clamp(1.75rem, 3vw, 2.5rem);
-              font-weight: 700;
-              color: var(--color-dark);
-              margin-bottom: 1rem;
-            "
-          >
-            Property Off-Market or Page Not Found
-          </h1>
-
-          <p
-            style="
-              color: var(--color-text-muted);
-              font-size: 1.05rem;
-              line-height: 1.7;
-              margin-bottom: 2.25rem;
-            "
-          >
-            The listing, policy document, or destination you requested might
-            have been sold, archived, or temporarily relocated. Use our property
-            search or return to the main catalogue.
-          </p>
-
-          <!-- Search Box -->
-          <form
-            action="properties.html"
-            method="GET"
-            style="
-              display: flex;
-              gap: 0.5rem;
-              max-width: 480px;
-              margin: 0 auto 2.5rem auto;
-            "
-          >
-            <input
-              type="text"
-              name="keyword"
-              class="form-input"
-              placeholder="Search verified properties by locality..."
-              style="border-radius: var(--radius-sm)"
-              required
-            />
-            <button
-              type="submit"
-              class="btn btn-primary"
-              style="flex-shrink: 0"
-            >
-              Search
-            </button>
-          </form>
-
-          <!-- Dual CTA Buttons -->
-          <div
-            style="
-              display: flex;
-              justify-content: center;
-              gap: 1rem;
-              margin-bottom: 3rem;
-              flex-wrap: wrap;
-            "
-          >
-            <a href="index.html" class="btn btn-dark btn-lg"
-              >Return to Homepage</a
-            >
-            <button
-              onclick="window.history.back()"
-              class="btn btn-outline btn-lg"
-            >
-              Go Back
-            </button>
-            <a href="contact.html" class="btn btn-ghost btn-lg">Contact Desk</a>
-          </div>
-
-          <!-- Helpful Quick Links Grid -->
-          <div
-            style="border-top: 1px solid var(--color-border); padding-top: 2rem"
-          >
-            <span
-              style="
-                font-size: 0.8125rem;
-                font-weight: 700;
-                color: var(--color-text-muted);
-                text-transform: uppercase;
-                letter-spacing: 0.08em;
-                display: block;
-                margin-bottom: 1rem;
-              "
-              >Popular Destinations</span
-            >
-            <div
-              style="
-                display: flex;
-                justify-content: center;
-                gap: 1.5rem;
-                flex-wrap: wrap;
-                font-size: 0.9375rem;
-                font-weight: 500;
-              "
-            >
-              <a
-                href="properties.html?type=Villa"
-                style="color: var(--color-dark); text-decoration: underline"
-                >Salem Luxury Villas</a
-              >
-              <a
-                href="properties.html?status=sale"
-                style="color: var(--color-dark); text-decoration: underline"
-                >Homes For Sale</a
-              >
-              <a
-                href="about.html"
-                style="color: var(--color-dark); text-decoration: underline"
-                >Our Salem Genesis</a
-              >
-              <a
-                href="services.html"
-                style="color: var(--color-dark); text-decoration: underline"
-                >Legal Title Escrow</a
-              >
-              <a
-                href="contact.html"
-                style="color: var(--color-dark); text-decoration: underline"
-                >MMR Complex Office</a
-              >
-            </div>
-          </div>
+    <main id="main-content" style="flex: 1; display: flex; align-items: center; justify-content: center; overflow: hidden; padding: 1.5rem; margin: 0;">
+      <div class="error-404-fixed-wrap">
+        <!-- Large Branded 404 Visual -->
+        <div class="error-404-badge-code">
+          404
         </div>
-      </section>
-    </main>
 
-    <!-- Global Footer -->
-    <footer class="main-footer">
-      <div class="container">
-        <div class="footer-top">
-          <div class="footer-brand">
-            <a href="index.html"
-              ><img
-                src="assets/images/stackly-logo.webp"
-                alt="Stackly"
-                class="footer-logo-img"
-                width="130"
-                height="42"
-            /></a>
-            <p>
-              Stackly Real Estate - South India's trusted luxury property
-              ecosystem.
-            </p>
-          </div>
-          <div>
-            <h4 class="footer-col-title">Quick Links</h4>
-            <ul class="footer-links">
-              <li><a href="index.html" class="footer-link">Home</a></li>
-              <li>
-                <a href="properties.html" class="footer-link">Properties</a>
-              </li>
-              <li><a href="contact.html" class="footer-link">Contact</a></li>
-            </ul>
-          </div>
-          <div>
-            <h4 class="footer-col-title">Salem Office</h4>
-            <div class="footer-contact-item">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-              >
-                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                <circle cx="12" cy="10" r="3" />
-              </svg>
-              <span>MMR Complex, Chinna Thirupathi, Salem 636008</span>
-            </div>
-          </div>
-          <div>
-            <h4 class="footer-col-title">Contact</h4>
-            <p style="color: #94a3b8; font-size: 0.9rem">
-              Phone: +91 9876543210<br />Email: hello@thestackly.com
-            </p>
-          </div>
-        </div>
-        <div class="footer-bottom">
-          <div>© 2026 Stackly Real Estate Network. All rights reserved.</div>
+        <h1 class="error-404-title-fixed">
+          Property Off-Market or Page Not Found
+        </h1>
+
+        <p class="error-404-text-fixed">
+          The listing, policy document, or destination you requested might
+          have been sold, archived, or temporarily relocated. Use our property
+          search or return to the main catalogue.
+        </p>
+
+        <!-- Return Action Buttons -->
+        <div class="error-404-actions-fixed">
+          <a href="index.html" class="btn btn-primary btn-lg">Return to Homepage</a>
+          <button
+            onclick="window.history.back()"
+            class="btn btn-outline btn-lg"
+          >
+            Go Back
+          </button>
         </div>
       </div>
-    </footer>
+    </main>
 
     <script src="assets/js/store.js"></script>
     <script src="assets/js/main.js"></script>

@@ -566,3 +566,527 @@
     padding: 1rem 1.25rem;
   }
 }
+
+/* Enhanced Dashboard Content Components */
+.dash-market-ticker {
+  background: linear-gradient(90deg, #1b2032 0%, #252b42 100%);
+  border: 1px solid rgba(146, 200, 0, 0.25);
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1.25rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
+.dash-market-ticker-badge {
+  background: var(--color-primary);
+  color: var(--color-dark);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  padding: 0.25rem 0.65rem;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.dash-market-ticker-items {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  font-size: 0.8125rem;
+  color: #cbd5e1;
+}
+
+.dash-market-ticker-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.dash-market-ticker-item strong {
+  color: #ffffff;
+}
+
+.dash-market-ticker-item span.gain {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+/* Quick Actions Toolbar */
+.quick-actions-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  padding: 1rem 1.25rem;
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.quick-actions-label {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  color: var(--color-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 0.5rem;
+}
+
+.action-chip {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: var(--radius-full);
+  background: #f1f5f9;
+  color: var(--color-dark);
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  text-decoration: none;
+}
+
+.action-chip:hover {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: var(--color-dark);
+  transform: translateY(-1px);
+}
+
+/* Progress Bar Components */
+.progress-bar-wrap {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: var(--radius-full);
+  overflow: hidden;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: var(--color-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.5s ease;
+}
+
+/* Step Timelines */
+.step-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  padding-left: 1.5rem;
+}
+
+.step-timeline::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 6px;
+  bottom: 6px;
+  width: 2px;
+  background: #e2e8f0;
+}
+
+.step-timeline-item {
+  position: relative;
+}
+
+.step-timeline-item::before {
+  content: "";
+  position: absolute;
+  left: -1.5rem;
+  top: 4px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 3px solid var(--color-primary);
+}
+
+.step-timeline-item.done::before {
+  background: var(--color-primary);
+}
+
+.step-timeline-title {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--color-dark);
+  margin-bottom: 0.2rem;
+}
+
+.step-timeline-desc {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+/* Info Callout */
+.info-callout {
+  padding: 1rem 1.25rem;
+  border-radius: var(--radius-sm);
+  background: rgba(146, 200, 0, 0.08);
+  border-left: 4px solid var(--color-primary);
+  margin-bottom: 1.25rem;
+  font-size: 0.875rem;
+  color: var(--color-dark);
+}
+
+
+/* ==========================================================================
+   Restyled Luxury Comparative Rental Yield Section (Admin Analytics & Yields)
+   ========================================================================== */
+
+.yield-panel-executive {
+  background: #ffffff;
+  border-radius: var(--radius-md);
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.05);
+  margin-bottom: 2rem;
+  overflow: hidden;
+}
+
+.yield-panel-header {
+  padding: 1.5rem 1.75rem;
+  background: linear-gradient(135deg, #1b2032 0%, #131722 100%);
+  color: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 3px solid var(--color-primary);
+}
+
+.yield-panel-title-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.yield-panel-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #ffffff;
+  letter-spacing: -0.01em;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.yield-panel-subtitle {
+  font-size: 0.8125rem;
+  color: #94a3b8;
+  margin: 0;
+}
+
+.yield-header-badges {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+}
+
+.yield-badge-alpha {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(146, 200, 0, 0.18);
+  border: 1px solid var(--color-primary);
+  color: var(--color-primary);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  padding: 0.35rem 0.85rem;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.02em;
+}
+
+.yield-body {
+  padding: 1.75rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.75rem;
+}
+
+/* Metric Cards Deck */
+.yield-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.yield-metric-box {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 1.15rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.yield-metric-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px -3px rgba(0, 0, 0, 0.07);
+}
+
+.yield-metric-box.highlight {
+  background: linear-gradient(145deg, #f7fee7 0%, #ffffff 100%);
+  border-color: #bef264;
+  border-left: 4px solid var(--color-primary);
+}
+
+.yield-metric-caption {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.yield-metric-val {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: var(--color-dark);
+  line-height: 1.1;
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+}
+
+.yield-metric-val span {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.yield-metric-footer {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--color-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.25rem;
+}
+
+.yield-metric-footer.muted {
+  color: #64748b;
+}
+
+/* Visual Bar Telemetry Deck */
+.yield-bars-deck {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.yield-bar-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.yield-bar-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.875rem;
+}
+
+.yield-bar-location {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-weight: 600;
+  color: var(--color-dark);
+}
+
+.yield-bar-badge-pill {
+  font-size: 0.6875rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.badge-top-performer {
+  background: rgba(146, 200, 0, 0.18);
+  color: #365314;
+  border: 1px solid rgba(146, 200, 0, 0.4);
+}
+
+.badge-metro {
+  background: #f1f5f9;
+  color: #475569;
+}
+
+.yield-bar-nums {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  font-weight: 700;
+  font-size: 0.9375rem;
+  color: var(--color-dark);
+}
+
+.yield-bar-net {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #64748b;
+}
+
+.yield-track {
+  width: 100%;
+  height: 24px;
+  background: #f1f5f9;
+  border-radius: 6px;
+  overflow: hidden;
+  position: relative;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.yield-fill {
+  height: 100%;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 0.6rem;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  transition: width 1s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.yield-fill-primary {
+  background: linear-gradient(90deg, #7ba800 0%, #92c800 100%);
+  color: #1b2032;
+  box-shadow: 0 0 12px rgba(146, 200, 0, 0.4);
+}
+
+.yield-fill-coimbatore {
+  background: linear-gradient(90deg, #0284c7 0%, #38bdf8 100%);
+}
+
+.yield-fill-hyderabad {
+  background: linear-gradient(90deg, #475569 0%, #64748b 100%);
+}
+
+.yield-fill-bangalore {
+  background: linear-gradient(90deg, #64748b 0%, #94a3b8 100%);
+}
+
+.yield-fill-chennai {
+  background: linear-gradient(90deg, #64748b 0%, #94a3b8 100%);
+}
+
+.yield-fill-mumbai {
+  background: linear-gradient(90deg, #94a3b8 0%, #cbd5e1 100%);
+  color: #334155;
+}
+
+/* Institutional Breakdown Matrix Table */
+.yield-table-container {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: var(--radius-sm);
+}
+
+.yield-luxury-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  font-size: 0.8125rem;
+}
+
+.yield-luxury-table thead {
+  background: #f8fafc;
+  color: #475569;
+  font-weight: 700;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+.yield-luxury-table th,
+.yield-luxury-table td {
+  padding: 0.9rem 1.15rem;
+  white-space: nowrap;
+}
+
+.yield-luxury-table tbody tr {
+  border-bottom: 1px solid #f1f5f9;
+  transition: background-color 0.15s ease;
+}
+
+.yield-luxury-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.yield-luxury-table tr.salem-highlight-row {
+  background: rgba(146, 200, 0, 0.08);
+  font-weight: 600;
+}
+
+.yield-luxury-table tr.salem-highlight-row td:first-child {
+  border-left: 4px solid var(--color-primary);
+  color: #1b2032;
+  font-weight: 700;
+}
+
+/* Strategic Intelligence Takeaway Box */
+.yield-takeaway-card {
+  padding: 1.25rem 1.5rem;
+  background: #1b2032;
+  color: #e2e8f0;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  border-left: 4px solid var(--color-primary);
+}
+
+.yield-takeaway-icon {
+  background: rgba(146, 200, 0, 0.15);
+  color: var(--color-primary);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.yield-takeaway-title {
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin-bottom: 0.35rem;
+}
+
+.yield-takeaway-text {
+  font-size: 0.8125rem;
+  line-height: 1.55;
+  color: #cbd5e1;
+  margin: 0;
+}

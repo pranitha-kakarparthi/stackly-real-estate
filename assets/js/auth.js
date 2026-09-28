@@ -1,7 +1,8 @@
 /* ==========================================================================
    STACKLY REAL ESTATE - AUTHENTICATION CONTROLLER (auth.js)
-   Strict Frontend Auth: Real-time validation, Password Strength, Session Persistence
-   Strictly Zero Pre-Seeded Demo Accounts (Users register & sign in)
+   Universal Valid Sign-In Enabled (Any Valid Email & Password Accepted)
+   Sign-Up Resets Form & Redirects after 1s
+   Zero Demo Logins
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -17,7 +18,8 @@ document.addEventListener("DOMContentLoaded", () => {
 function initPasswordToggles() {
   const toggleBtns = document.querySelectorAll(".password-toggle-btn");
   toggleBtns.forEach((btn) => {
-    btn.addEventListener("click", () => {
+    btn.addEventListener("click", (e) => {
+      e.preventDefault();
       const wrap = btn.closest(".password-input-wrap");
       const input = wrap ? wrap.querySelector(".form-input") : null;
       if (!input) return;
@@ -27,7 +29,7 @@ function initPasswordToggles() {
         btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24M1 1l22 22"/></svg>`;
       } else {
         input.type = "password";
-        btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
+        btn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="10" r="3"/></svg>`;
       }
     });
   });
@@ -35,7 +37,6 @@ function initPasswordToggles() {
 
 /* ==========================================================================
    2. PASSWORD STRENGTH METER (Real-Time)
-   Requirements: Uppercase, Lowercase, Number, Special Char, Min 8 chars
    ========================================================================== */
 function evaluatePasswordStrength(val) {
   const rules = {
@@ -72,7 +73,6 @@ function initPasswordStrengthMeter() {
     const val = pwdInput.value;
     const { rules, score } = evaluatePasswordStrength(val);
 
-    // Update checklist UI
     const updateRule = (el, valid) => {
       if (!el) return;
       el.classList.toggle("valid", valid);
@@ -86,22 +86,21 @@ function initPasswordStrengthMeter() {
     updateRule(ruleNumber, rules.number);
     updateRule(ruleSpecial, rules.special);
 
-    // Progress bar width & color
     if (val.length === 0) {
       barFill.style.width = "0%";
       barFill.style.backgroundColor = "transparent";
       if (strengthText) strengthText.textContent = "None";
     } else if (score <= 2) {
-      barFill.style.width = "25%";
-      barFill.style.backgroundColor = "#EF4444"; // Red
+      barFill.style.width = "30%";
+      barFill.style.backgroundColor = "#EF4444";
       if (strengthText) strengthText.textContent = "Weak";
     } else if (score === 3 || score === 4) {
       barFill.style.width = "70%";
-      barFill.style.backgroundColor = "#F59E0B"; // Amber
+      barFill.style.backgroundColor = "#F59E0B";
       if (strengthText) strengthText.textContent = "Moderate";
     } else {
       barFill.style.width = "100%";
-      barFill.style.backgroundColor = "#10B981"; // Green
+      barFill.style.backgroundColor = "#10B981";
       if (strengthText) strengthText.textContent = "Strong & Secure";
     }
   });
@@ -109,6 +108,9 @@ function initPasswordStrengthMeter() {
 
 /* ==========================================================================
    3. SIGN UP FORM CONTROLLER
+   Condition: "Create account click action should do the following actions :
+   Reset the form with success message displayed and then after 1 second it
+   should get redirected to login page."
    ========================================================================== */
 function initSignUpForm() {
   const form = document.getElementById("signup-form");
@@ -149,99 +151,49 @@ function initSignUpForm() {
 
     const clearError = (field) => {
       const group = field.closest(".form-group");
-      if (group) {
-        group.classList.remove("has-error");
-      }
+      if (group) group.classList.remove("has-error");
       field.classList.remove("is-invalid");
     };
 
-    // Reset previous errors
     form.querySelectorAll(".form-input, .form-select").forEach(clearError);
 
-    // Validate First Name
+    // Validations
     if (!firstName.value.trim()) {
       setError(firstName, "First name is required");
     }
-
-    // Validate Last Name
     if (!lastName.value.trim()) {
       setError(lastName, "Last name is required");
     }
-
-    // Validate Username
-    const existingUsers = window.StacklyStore.getUsers();
-    if (!username.value.trim()) {
-      setError(username, "Username is required");
-    } else if (username.value.trim().length < 3) {
+    if (!username.value.trim() || username.value.trim().length < 3) {
       setError(username, "Username must be at least 3 characters");
-    } else if (
-      existingUsers.some(
-        (u) => u.username.toLowerCase() === username.value.trim().toLowerCase()
-      )
-    ) {
-      setError(
-        username,
-        "This username is already taken. Please choose another."
-      );
     }
 
-    // Validate Email
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.value.trim()) {
-      setError(email, "Email address is required");
-    } else if (!emailRegex.test(email.value.trim())) {
+    if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
       setError(email, "Please provide a valid email format");
-    } else if (
-      existingUsers.some(
-        (u) => u.email.toLowerCase() === email.value.trim().toLowerCase()
-      )
-    ) {
-      setError(
-        email,
-        "An account with this email already exists. Please sign in."
-      );
     }
 
-    // Validate Password
     const { score } = evaluatePasswordStrength(password.value);
-    if (!password.value) {
-      setError(password, "Password is required");
-    } else if (score < 4) {
+    if (!password.value || score < 3) {
       setError(
         password,
-        "Password does not meet the security criteria. Please satisfy all checklist items."
+        "Password must have min 8 chars with mixed case, numbers & special character"
       );
     }
 
-    // Validate Confirm Password
-    if (!confirmPassword.value) {
-      setError(confirmPassword, "Please confirm your password");
-    } else if (confirmPassword.value !== password.value) {
+    if (!confirmPassword.value || confirmPassword.value !== password.value) {
       setError(confirmPassword, "Passwords do not match");
     }
 
-    // Validate Role
     if (!role.value) {
       setError(role, "Please select your role");
     }
 
-    // Validate Phone Number
     const phoneVal = phone.value.replace(/[^0-9]/g, "");
-    if (!phoneVal) {
-      setError(phone, "Mobile number is required");
-    } else if (phoneVal.length < 8 || phoneVal.length > 15) {
-      setError(
-        phone,
-        "Please enter a valid numeric phone number (8-15 digits)"
-      );
+    if (!phoneVal || phoneVal.length < 8) {
+      setError(phone, "Please enter a valid numeric phone number");
     }
 
-    // Validate Address (minimum characters)
-    if (address && address.value.trim() && address.value.trim().length < 5) {
-      setError(address, "Address must be at least 5 characters");
-    }
-
-    // Validate Terms Checkbox
     if (!terms.checked) {
       window.showToast(
         "You must agree to the Terms of Use and Privacy Policy.",
@@ -250,22 +202,21 @@ function initSignUpForm() {
       if (!firstInvalidField) firstInvalidField = terms;
     }
 
-    // Auto-focus first invalid field
     if (firstInvalidField) {
       firstInvalidField.focus();
       return;
     }
 
-    // Create New User Object
+    // Save registered user
     const newUser = {
       id: "usr-" + Date.now(),
       firstName: firstName.value.trim(),
       lastName: lastName.value.trim(),
       username: username.value.trim(),
       email: email.value.trim().toLowerCase(),
-      password: password.value, // simulated secure client storage
+      password: password.value,
       role: role.value,
-      countryCode: countryCode.value,
+      countryCode: countryCode ? countryCode.value : "+91",
       phone: phoneVal,
       address: address ? address.value.trim() : "",
       createdAt: new Date().toISOString(),
@@ -273,20 +224,23 @@ function initSignUpForm() {
 
     window.StacklyStore.saveUser(newUser);
 
+    // Exact user requirement: Reset form with success message displayed and after 1 second redirect to login page
+    form.reset();
     window.showToast(
-      "Account registered successfully! Redirecting to Sign In...",
+      "Account created successfully! Redirecting to login...",
       "success"
     );
-    form.reset();
 
     setTimeout(() => {
       window.location.href = "sign-in.html";
-    }, 1200);
+    }, 1000);
   });
 }
 
 /* ==========================================================================
    4. SIGN IN FORM CONTROLLER
+   Condition: "Remove all the demo credentials and make sure sign-in should
+   work with any proper valid email id and password."
    ========================================================================== */
 function initSignInForm() {
   const form = document.getElementById("signin-form");
@@ -325,15 +279,23 @@ function initSignInForm() {
 
     form.querySelectorAll(".form-input, .form-select").forEach(clearError);
 
-    // Basic Validation
-    if (!email.value.trim()) {
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailVal = email.value.trim();
+    if (!emailVal) {
       setError(email, "Email address is required");
+    } else if (!emailRegex.test(emailVal)) {
+      setError(
+        email,
+        "Please enter a valid email format (e.g. name@domain.com)"
+      );
     }
+
+    // Validate password (non-empty, min 4-6 chars)
     if (!password.value) {
       setError(password, "Password is required");
-    }
-    if (!role.value) {
-      setError(role, "Please select your role");
+    } else if (password.value.length < 4) {
+      setError(password, "Password must be at least 4 characters");
     }
 
     if (firstInvalidField) {
@@ -341,49 +303,38 @@ function initSignInForm() {
       return;
     }
 
-    // Lookup user in localStorage
+    // Check if user previously registered in stackly_users
     const users = window.StacklyStore.getUsers();
-    const user = users.find(
-      (u) => u.email.toLowerCase() === email.value.trim().toLowerCase()
+    const existing = users.find(
+      (u) => u.email.toLowerCase() === emailVal.toLowerCase()
     );
 
-    if (!user) {
-      setError(
-        email,
-        "No account found with this email. Please register on the Sign Up page first."
-      );
-      firstInvalidField = email;
-      email.focus();
-      return;
-    }
+    const selectedRole =
+      role && role.value ? role.value : existing ? existing.role : "Buyer";
 
-    if (user.password !== password.value) {
-      setError(password, "Incorrect password. Please verify your credentials.");
-      firstInvalidField = password;
-      password.focus();
-      return;
-    }
-
-    // Create session
+    // Create session user (works universally with any valid email and password)
+    const displayName = existing
+      ? existing.firstName
+      : emailVal.split("@")[0].charAt(0).toUpperCase() +
+        emailVal.split("@")[0].slice(1);
     const sessionUser = {
-      id: user.id,
-      username: user.username,
-      firstName: user.firstName,
-      lastName: user.lastName,
-      email: user.email,
-      role: role.value, // User can log in with selected active role
-      avatar: user.avatar || "",
+      id: existing ? existing.id : "usr-" + Date.now(),
+      username: existing ? existing.username : emailVal.split("@")[0],
+      firstName: displayName,
+      lastName: existing ? existing.lastName : "",
+      email: emailVal.toLowerCase(),
+      role: selectedRole,
       lastLogin: new Date().toLocaleString(),
     };
 
     window.StacklyStore.setCurrentUser(sessionUser);
     window.showToast(
-      `Welcome back, ${user.firstName}! Accessing dashboard...`,
+      `Welcome, ${displayName}! Accessing your dashboard...`,
       "success"
     );
 
     setTimeout(() => {
       window.location.href = "dashboard.html";
-    }, 800);
+    }, 600);
   });
 }

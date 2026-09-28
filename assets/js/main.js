@@ -1,17 +1,15 @@
 /* ==========================================================================
-   STACKLY REAL ESTATE - MAIN JAVASCRIPT
-   Global: Loader, Dynamic Greetings, Sticky Nav, Mobile Menu, Toasts, 404 Interceptor
+   STACKLY REAL ESTATE - MAIN JAVASCRIPT (main.js)
+   Global: Loader, Sticky Nav, Mobile Menu, Toasts, Universal 404 Interceptor
    ========================================================================== */
 
 document.addEventListener("DOMContentLoaded", () => {
   initLoader();
-  initDynamicGreetings();
   initStickyHeader();
   initNavigationHighlight();
   initMobileDrawer();
   initAccordion();
-  initNewsletterForms();
-  initAction404Interceptors();
+  initUniversal404Interceptors();
 });
 
 /* ==========================================================================
@@ -24,13 +22,12 @@ function initLoader() {
   const hideLoader = () => {
     loader.classList.add("fade-out");
     setTimeout(() => {
-      if (loader.parentNode) {
+      if (loader && loader.parentNode) {
         loader.parentNode.removeChild(loader);
       }
     }, 450);
   };
 
-  // Dismiss immediately when ready, or fallback at 900ms
   if (document.readyState === "complete") {
     setTimeout(hideLoader, 200);
   } else {
@@ -40,9 +37,7 @@ function initLoader() {
 }
 
 /* ==========================================================================
-   2. DYNAMIC TIME-AWARE GREETINGS
-   Requirements: "Whenever there is a greeting message displayed anywhere in
-   the website use the relevant time zones and duration of the day"
+   2. DYNAMIC TIME-AWARE GREETING (For Dashboard)
    ========================================================================== */
 function getGreetingByTime() {
   const now = new Date();
@@ -57,21 +52,6 @@ function getGreetingByTime() {
   }
 }
 
-function initDynamicGreetings() {
-  const greeting = getGreetingByTime();
-  const greetingEls = document.querySelectorAll(
-    ".dynamic-greeting, [data-greeting]"
-  );
-  greetingEls.forEach((el) => {
-    const customUser = el.getAttribute("data-user");
-    if (customUser) {
-      el.textContent = `${greeting}, ${customUser}!`;
-    } else {
-      el.textContent = `${greeting}! Welcome to Stackly`;
-    }
-  });
-}
-
 /* ==========================================================================
    3. STICKY HEADER BEHAVIOR
    ========================================================================== */
@@ -80,7 +60,7 @@ function initStickyHeader() {
   if (!header) return;
 
   const onScroll = () => {
-    if (window.scrollY > 40) {
+    if (window.scrollY > 30) {
       header.classList.add("scrolled");
     } else {
       header.classList.remove("scrolled");
@@ -93,7 +73,6 @@ function initStickyHeader() {
 
 /* ==========================================================================
    4. NAVIGATION HIGHLIGHTING
-   Requirements: "Need to highlight nav item in the nav bar based on the current active page"
    ========================================================================== */
 function initNavigationHighlight() {
   const currentPath = window.location.pathname.toLowerCase();
@@ -105,7 +84,7 @@ function initNavigationHighlight() {
     const href = link.getAttribute("href");
     if (!href || href === "#" || href.startsWith("javascript:")) return;
 
-    const targetFile = href.split("/").pop().toLowerCase();
+    const targetFile = href.split("?")[0].split("/").pop().toLowerCase();
     const currentFile =
       currentPath.split("/").pop().toLowerCase() || "index.html";
 
@@ -114,7 +93,6 @@ function initNavigationHighlight() {
       (currentFile === "" && targetFile === "index.html")
     ) {
       link.classList.add("active");
-      // If inside dropdown, mark parent nav-link too
       const parentNavItem = link.closest(".nav-item");
       if (parentNavItem) {
         const parentLink = parentNavItem.querySelector(".nav-link");
@@ -156,7 +134,6 @@ function initMobileDrawer() {
 
   if (closeBtn) closeBtn.addEventListener("click", closeDrawer);
 
-  // Close on mobile link click
   const drawerLinks = drawer.querySelectorAll("a");
   drawerLinks.forEach((a) => {
     a.addEventListener("click", closeDrawer);
@@ -174,7 +151,6 @@ function initAccordion() {
 
     trigger.addEventListener("click", () => {
       const isActive = item.classList.contains("active");
-      // Close other accordions in the same group
       const parentAccordion = item.closest(".faq-accordion");
       if (parentAccordion) {
         parentAccordion.querySelectorAll(".faq-item").forEach((other) => {
@@ -187,64 +163,92 @@ function initAccordion() {
 }
 
 /* ==========================================================================
-   7. NEWSLETTER FORMS
+   7. UNIVERSAL 404 ACTION BUTTON INTERCEPTOR
+   Condition: "Redirect the all actions buttons except the nav bar actions to 404 page across the website"
+   Condition: "In dashboard pages: All the action buttons in the content should be redirected to 404 page"
    ========================================================================== */
-function initNewsletterForms() {
-  const forms = document.querySelectorAll(".footer-newsletter-form");
-  forms.forEach((form) => {
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const input = form.querySelector(".newsletter-input");
-      if (!input || !input.value.trim() || !input.value.includes("@")) {
-        showToast("Please provide a valid email address.", "error");
-        if (input) input.focus();
-        return;
-      }
-      showToast(
-        "Thank you! You have subscribed to Stackly Market Insights.",
-        "success"
-      );
-      input.value = "";
-    });
-  });
-}
-
-/* ==========================================================================
-   8. 404 INTERCEPTOR FOR DEMO ACTIONS / SOCIAL LINKS / POLICIES
-   Requirements: "Every action button should be redirected to 404 page"
-   Social sign-ins, terms, forgot password, unlinked action buttons -> 404.html
-   ========================================================================== */
-function initAction404Interceptors() {
+function initUniversal404Interceptors() {
   document.addEventListener("click", (e) => {
     const target = e.target.closest("a, button");
     if (!target) return;
 
-    // Check if element has action-404 class or points explicitly to /terms or /newsletter-policy or #
-    const href = target.getAttribute("href");
-    const isAction404 =
-      target.classList.contains("action-404") ||
-      target.classList.contains("social-btn") ||
-      target.classList.contains("top-social-link") ||
-      (href &&
-        (href === "#" ||
-          href === "/terms" ||
-          href === "/newsletter-policy" ||
-          href === "/forgot-password" ||
-          href === "/reset-password"));
+    // Allow normal operation if already on 404.html for return navigation
+    if (window.location.pathname.toLowerCase().endsWith("404.html")) {
+      return;
+    }
 
-    // Don't intercept actual working pages or submit buttons inside valid forms
-    if (isAction404) {
-      if (target.type === "submit" && target.closest("form")) {
-        return; // allow form submission
+    // Exempt 1: Primary Navbar and Mobile Drawer links and actions
+    if (
+      target.closest(".main-header") ||
+      target.closest(".mobile-nav-drawer") ||
+      target.closest(".auth-header")
+    ) {
+      return; // allow normal navbar navigation
+    }
+
+    // Specific Footer Condition: "Redirect all the footer links to '404.html' except quick links"
+    const footer = target.closest(".main-footer");
+    if (footer) {
+      const parentCol = target.closest(".footer-links")?.closest("div");
+      const colTitle = parentCol
+        ?.querySelector(".footer-col-title")
+        ?.textContent.trim();
+      const isQuickLink =
+        colTitle === "Quick Links" && target.tagName.toLowerCase() === "a";
+      if (isQuickLink) {
+        return; // allow quick link navigation to subpages
       }
+      // All other footer links (Services, Properties, Salem HQ contact links, Socials, Brand logo, Legal links) redirect to 404
       e.preventDefault();
       window.location.href = "404.html";
+      return;
     }
+
+    // Exempt 2: Passive navigation links (breadcrumbs, auth back link)
+    if (
+      target.closest(".breadcrumbs") ||
+      target.classList.contains("auth-back-link")
+    ) {
+      return; // allow standard page navigation
+    }
+
+    // Exempt 3: Form submit buttons for active functional forms
+    if (target.type === "submit") {
+      const form = target.closest("form");
+      if (form && (form.id === "signin-form" || form.id === "signup-form")) {
+        return; // allow form handlers to execute
+      }
+    }
+
+    // Exempt 4: UI controls (Password visibility toggle, FAQ accordion triggers, modal/mobile close)
+    if (
+      target.classList.contains("password-toggle-btn") ||
+      target.classList.contains("faq-trigger") ||
+      target.classList.contains("modal-close-btn") ||
+      target.classList.contains("mobile-close-btn") ||
+      target.classList.contains("hamburger-btn")
+    ) {
+      return;
+    }
+
+    // Exempt 5: Dashboard internal navigation tabs and session controls
+    if (
+      target.classList.contains("dash-nav-link") ||
+      target.classList.contains("dash-signout-btn") ||
+      target.id === "dash-notif-btn" ||
+      target.id === "dash-sidebar-toggle"
+    ) {
+      return; // allow dashboard tab switching and signout
+    }
+
+    // All action buttons (CTAs, card buttons, dashboard content action buttons, newsletter subscribe, etc.) redirect to 404!
+    e.preventDefault();
+    window.location.href = "404.html";
   });
 }
 
 /* ==========================================================================
-   9. GLOBAL TOAST NOTIFICATION UTILITY
+   8. GLOBAL TOAST NOTIFICATION UTILITY
    ========================================================================== */
 function showToast(message, type = "info") {
   let container = document.querySelector(".toast-container");
@@ -267,7 +271,7 @@ function showToast(message, type = "info") {
     toast.style.transform = "translateY(10px)";
     toast.style.transition = "all 0.3s ease";
     setTimeout(() => {
-      if (toast.parentNode) toast.parentNode.removeChild(toast);
+      if (toast && toast.parentNode) toast.parentNode.removeChild(toast);
     }, 300);
   }, 3500);
 }

@@ -1,6 +1,7 @@
 /* ==========================================================================
-   STACKLY REAL ESTATE - DATA STORAGE LAYER (localStorage)
-   Strictly No Demo Accounts Seeded (User Registers Own Account)
+   STACKLY REAL ESTATE - DATA STORAGE LAYER (store.js)
+   12 Completely Unique Properties (Zero Repetition in Images or Content)
+   Zero Pre-Seeded Demo Accounts (Universal Valid Sign-In Enabled)
    ========================================================================== */
 
 const STORAGE_KEYS = {
@@ -12,7 +13,7 @@ const STORAGE_KEYS = {
   NOTIFICATIONS: "stackly_notifications",
 };
 
-// Default Real Estate Properties Database
+// 12 Distinct, Non-Repetitive Real Estate Properties
 const DEFAULT_PROPERTIES = [
   {
     id: "prop-1",
@@ -31,7 +32,7 @@ const DEFAULT_PROPERTIES = [
     featured: true,
     agent: {
       name: "Karthik Raja",
-      role: "Principal Broker",
+      role: "Principal Luxury Broker",
       phone: "+91 9876543210",
       avatar: "assets/images/agents/agent-1.webp",
     },
@@ -62,7 +63,7 @@ const DEFAULT_PROPERTIES = [
     featured: true,
     agent: {
       name: "Ananya Sharma",
-      role: "Luxury Property Consultant",
+      role: "Director of Residential Sales",
       phone: "+91 9876543211",
       avatar: "assets/images/agents/agent-2.webp",
     },
@@ -92,7 +93,7 @@ const DEFAULT_PROPERTIES = [
     featured: true,
     agent: {
       name: "Karthik Raja",
-      role: "Principal Broker",
+      role: "Principal Luxury Broker",
       phone: "+91 9876543210",
       avatar: "assets/images/agents/agent-1.webp",
     },
@@ -123,7 +124,7 @@ const DEFAULT_PROPERTIES = [
     featured: false,
     agent: {
       name: "Ananya Sharma",
-      role: "Luxury Property Consultant",
+      role: "Director of Residential Sales",
       phone: "+91 9876543211",
       avatar: "assets/images/agents/agent-2.webp",
     },
@@ -169,7 +170,7 @@ const DEFAULT_PROPERTIES = [
   },
   {
     id: "prop-6",
-    title: "Modernist Glass Pavilion Penthouse",
+    title: "Modernist Glass Pavilion Duplex",
     type: "Apartment",
     status: "rent",
     price: 120000,
@@ -258,27 +259,146 @@ const DEFAULT_PROPERTIES = [
     description:
       "Charming modern bungalow situated just minutes from MMR Complex, surrounded by peaceful greenery and reputed educational institutions.",
   },
+  {
+    id: "prop-9",
+    title: "Heritage Courtyard Contemporary Loft",
+    type: "Apartment",
+    status: "rent",
+    price: 65000,
+    priceDisplay: "₹65,000 / mo",
+    beds: 2,
+    baths: 2,
+    sqft: 1950,
+    garage: 1,
+    address: "Gandhi Road Heritage District",
+    city: "Salem",
+    image: "assets/images/properties/property-9.webp",
+    featured: false,
+    agent: {
+      name: "Karthik Raja",
+      role: "Principal Luxury Broker",
+      phone: "+91 9876543210",
+      avatar: "assets/images/agents/agent-1.webp",
+    },
+    amenities: [
+      "Exposed Brick Accent",
+      "Double Glazed Windows",
+      "Boutique Complex",
+      "Dedicated Covered Parking",
+    ],
+    description:
+      "A fusion of historic Chettinad courtyard aesthetic and contemporary urban industrial loft architecture in central Salem.",
+  },
+  {
+    id: "prop-10",
+    title: "The Monarch Hillside Gated Manor",
+    type: "Villa",
+    status: "sale",
+    price: 27500000,
+    priceDisplay: "₹2.75 Cr",
+    beds: 5,
+    baths: 5,
+    sqft: 5400,
+    garage: 3,
+    address: "Yercaud Foothills Scenic Way",
+    city: "Salem",
+    image: "assets/images/properties/property-10.webp",
+    featured: true,
+    agent: {
+      name: "Vikram Menon",
+      role: "Managing Director",
+      phone: "+91 9876543212",
+      avatar: "assets/images/agents/agent-5.webp",
+    },
+    amenities: [
+      "Unobstructed Mountain View",
+      "Infinity Jacuzzi",
+      "Private Helipad Access",
+      "Landscaped Perennial Groves",
+    ],
+    description:
+      "Commanding breathtaking panoramic mountain views at the Yercaud foothills, this ultra-luxury retreat sets a new pinnacle of residential opulence.",
+  },
+  {
+    id: "prop-11",
+    title: "Emerald Palms Coastal Sanctuary",
+    type: "Villa",
+    status: "sale",
+    price: 22000000,
+    priceDisplay: "₹2.20 Cr",
+    beds: 4,
+    baths: 4,
+    sqft: 4100,
+    garage: 2,
+    address: "East Coast Road Gated Enclave",
+    city: "Chennai",
+    image: "assets/images/properties/property-11.webp",
+    featured: false,
+    agent: {
+      name: "Ananya Sharma",
+      role: "Director of Residential Sales",
+      phone: "+91 9876543211",
+      avatar: "assets/images/agents/agent-2.webp",
+    },
+    amenities: [
+      "Private Beach Access",
+      "Olympic Lap Pool",
+      "Sub-Zero Appliances",
+      "Italian Pergola",
+    ],
+    description:
+      "Refined ocean-breeze coastal retreat with dramatic floor-to-ceiling glass pavilions, private garden lap pool, and 24/7 manned security.",
+  },
+  {
+    id: "prop-12",
+    title: "Apex Prime Commercial Chambers",
+    type: "Commercial",
+    status: "sale",
+    price: 45000000,
+    priceDisplay: "₹4.50 Cr",
+    beds: 0,
+    baths: 6,
+    sqft: 9800,
+    garage: 10,
+    address: "Avinashi Road Financial Hub",
+    city: "Coimbatore",
+    image: "assets/images/properties/property-12.webp",
+    featured: false,
+    agent: {
+      name: "Pooja Iyer",
+      role: "Senior Commercial Broker",
+      phone: "+91 9876543213",
+      avatar: "assets/images/agents/agent-6.webp",
+    },
+    amenities: [
+      "Central Air Filtration",
+      "Dual Escalators",
+      "Basement Valet Bay",
+      "High-Speed Telecom Racks",
+    ],
+    description:
+      "Turnkey Grade-A commercial complex ideal for multinational consultancy or luxury medical clinic in Coimbatore's premium corporate corridor.",
+  },
 ];
 
 // Initialize Storage
 function initStorage() {
   if (!localStorage.getItem(STORAGE_KEYS.USERS)) {
-    // Zero demo users: empty array
     localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify([]));
   }
-  if (!localStorage.getItem(STORAGE_KEYS.PROPERTIES)) {
-    localStorage.setItem(
-      STORAGE_KEYS.PROPERTIES,
-      JSON.stringify(DEFAULT_PROPERTIES)
-    );
-  }
+  // Store 12 unique properties
+  localStorage.setItem(
+    STORAGE_KEYS.PROPERTIES,
+    JSON.stringify(DEFAULT_PROPERTIES)
+  );
+
   if (!localStorage.getItem(STORAGE_KEYS.INQUIRIES)) {
     localStorage.setItem(STORAGE_KEYS.INQUIRIES, JSON.stringify([]));
   }
   if (!localStorage.getItem(STORAGE_KEYS.FAVORITES)) {
     localStorage.setItem(
       STORAGE_KEYS.FAVORITES,
-      JSON.stringify(["prop-1", "prop-3"])
+      JSON.stringify(["prop-1", "prop-5", "prop-10"])
     );
   }
   if (!localStorage.getItem(STORAGE_KEYS.NOTIFICATIONS)) {
@@ -409,10 +529,8 @@ function getNotifications() {
   }
 }
 
-// Auto init
 initStorage();
 
-// Export globals
 window.StacklyStore = {
   getUsers,
   saveUser,
