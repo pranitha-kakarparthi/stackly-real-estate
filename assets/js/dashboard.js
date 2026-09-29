@@ -18,12 +18,11 @@ document.addEventListener("DOMContentLoaded", () => {
     return;
   }
 
-  currentRole = currentUser.role || "Buyer";
+  currentRole = document.body.dataset.role || currentUser.role || "Buyer";
 
   initHeaderUI(currentUser);
   initNotifications();
   initSidebarNavigation(currentUser);
-  initRoleQuickSwitcher(currentUser);
 
   // Render initial subpage
   renderSubpage(activeSubpage, currentUser);
@@ -83,34 +82,115 @@ function initHeaderUI(user) {
 }
 
 /* ==========================================================================
-   2. NOTIFICATIONS
+   2. NOTIFICATIONS (With "Mark read" Actions)
    ========================================================================== */
 function initNotifications() {
   const notifBtn = document.getElementById("dash-notif-btn");
   const notifDropdown = document.getElementById("dash-notif-dropdown");
   const notifList = document.getElementById("dash-notif-list");
   const notifBadge = document.getElementById("dash-notif-badge");
+  const markAllBtn = document.getElementById("dash-mark-all-read");
 
   if (!notifBtn || !notifDropdown) return;
 
-  const notifs = window.StacklyStore.getNotifications();
-  if (notifBadge) {
-    notifBadge.textContent = notifs.length;
+  const renderNotifications = () => {
+    const notifs = window.StacklyStore.getNotifications();
+    const unreadCount = notifs.filter((n) => !n.read).length;
+
+    if (notifBadge) {
+      if (unreadCount > 0) {
+        notifBadge.textContent = unreadCount;
+        notifBadge.classList.remove("hidden");
+        notifBadge.style.display = "flex";
+      } else {
+        notifBadge.textContent = "0";
+        notifBadge.classList.add("hidden");
+        notifBadge.style.display = "none";
+      }
+    }
+
+    if (markAllBtn) {
+      if (unreadCount === 0) {
+        markAllBtn.textContent = "All read ✓";
+        markAllBtn.style.opacity = "0.7";
+      } else {
+        markAllBtn.textContent = "Mark read";
+        markAllBtn.style.opacity = "1";
+      }
+    }
+
+    if (notifList) {
+      if (notifs.length === 0) {
+        notifList.innerHTML = `<div style="padding: 1.5rem; text-align: center; color: var(--color-text-muted); font-size: 0.8125rem;">No new notifications.</div>`;
+        return;
+      }
+
+      notifList.innerHTML = notifs
+        .map(
+          (n) => `
+        <div class="notif-item ${n.read ? "" : "unread"}" data-id="${n.id}">
+          <div class="notif-item-header">
+            <div style="font-weight: 600; color: var(--color-dark);">${n.title}</div>
+            ${
+              n.read
+                ? '<span style="font-size: 0.6875rem; color: #94a3b8;">Read</span>'
+                : `<button type="button" class="notif-item-mark-btn" data-id="${n.id}" title="Mark read">Mark read</button>`
+            }
+          </div>
+          <div style="color: var(--color-text-muted); font-size: 0.8125rem;">${n.message || n.text}</div>
+          <div class="notif-time">${n.time}</div>
+        </div>
+      `
+        )
+        .join("");
+
+      // Individual item mark read buttons
+      notifList.querySelectorAll(".notif-item-mark-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const id = btn.getAttribute("data-id");
+          if (id && window.StacklyStore.markNotificationRead) {
+            window.StacklyStore.markNotificationRead(id);
+            renderNotifications();
+            if (window.showToast) {
+              window.showToast("Notification marked as read.", "info");
+            }
+          }
+        });
+      });
+
+      // Clicking any unread notification item also marks it as read
+      notifList.querySelectorAll(".notif-item.unread").forEach((item) => {
+        item.addEventListener("click", (e) => {
+          if (e.target.closest(".notif-item-mark-btn")) return;
+          const id = item.getAttribute("data-id");
+          if (id && window.StacklyStore.markNotificationRead) {
+            window.StacklyStore.markNotificationRead(id);
+            renderNotifications();
+            if (window.showToast) {
+              window.showToast("Notification marked as read.", "info");
+            }
+          }
+        });
+      });
+    }
+  };
+
+  // Mark all as read button
+  if (markAllBtn) {
+    markAllBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (window.StacklyStore.markAllNotificationsRead) {
+        window.StacklyStore.markAllNotificationsRead();
+        renderNotifications();
+        if (window.showToast) {
+          window.showToast("All notifications marked as read.", "success");
+        }
+      }
+    });
   }
 
-  if (notifList) {
-    notifList.innerHTML = notifs
-      .map(
-        (n) => `
-      <div class="notif-item ${n.read ? "" : "unread"}">
-        <div style="font-weight: 600; color: var(--color-dark); margin-bottom: 2px;">${n.title}</div>
-        <div style="color: var(--color-text-muted); font-size: 0.8125rem;">${n.message}</div>
-        <div style="color: #94a3b8; font-size: 0.6875rem; margin-top: 4px;">${n.time}</div>
-      </div>
-    `
-      )
-      .join("");
-  }
+  renderNotifications();
 
   notifBtn.addEventListener("click", (e) => {
     e.stopPropagation();
@@ -125,7 +205,7 @@ function initNotifications() {
 }
 
 /* ==========================================================================
-   3. SIDEBAR NAVIGATION SWITCHER
+   3. SIDEBAR NAVIGATION SWITCHER (Scroll to Top on Subpage Switch)
    ========================================================================== */
 function initSidebarNavigation(user) {
   const navButtons = document.querySelectorAll(".dash-nav-link");
@@ -144,6 +224,18 @@ function initSidebarNavigation(user) {
       if (sidebar) sidebar.classList.remove("mobile-open");
 
       renderSubpage(view, user);
+
+      // Scroll to top upon clicking next subpage
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      const mainContainer =
+        document.querySelector(".dashboard-main") ||
+        document.querySelector(".dashboard-content") ||
+        document.getElementById("main-content");
+      if (mainContainer) {
+        mainContainer.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      document.documentElement.scrollTop = 0;
+      document.body.scrollTop = 0;
     });
   });
 }
@@ -159,6 +251,11 @@ function updateSubpageTitle(title) {
 function renderSubpage(view, user) {
   const container = document.getElementById("dashboard-subpage-container");
   if (!container) return;
+
+  // Ensure view is scrolled to top on subpage render
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
 
   const role = (user.role || currentRole || "Buyer").toLowerCase();
 
@@ -201,11 +298,11 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Quick Actions:</span>
-        <button class="action-chip action-404">+ Add New Listing</button>
-        <button class="action-chip action-404">Download Valuation Report</button>
-        <button class="action-chip action-404">Review Buyer Offers</button>
-        <button class="action-chip action-404">Book 4K Drone Scan</button>
-        <button class="action-chip action-404">Manage Showing Hours</button>
+        <a href="404.html" class="action-chip action-404">+ Add New Listing</a>
+        <a href="404.html" class="action-chip action-404">Download Valuation Report</a>
+        <a href="404.html" class="action-chip action-404">Review Buyer Offers</a>
+        <a href="404.html" class="action-chip action-404">Book 4K Drone Scan</a>
+        <a href="404.html" class="action-chip action-404">Manage Showing Hours</a>
       </div>
 
       <!-- S1: Seller KPIs -->
@@ -220,16 +317,16 @@ function renderOverviewView(container, user, role) {
       <div class="dash-panel">
         <div class="dash-panel-header">
           <h3 class="dash-panel-title">My Published Property Listings</h3>
-          <button class="btn btn-primary btn-sm action-404">+ Add New Property</button>
+          <a href="404.html" class="btn btn-primary btn-sm action-404">+ Add New Property</a>
         </div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Property Name</th><th>Locality</th><th>Asking Price</th><th>Views</th><th>Inquiries</th><th>Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Fairlands Modern Haven</strong></td><td>Fairlands, Salem</td><td>₹1.65 Cr</td><td>482</td><td>14 Leads</td><td><span class="status-pill status-active">Active</span></td><td><button class="btn btn-ghost btn-sm action-404">Manage</button></td></tr>
-              <tr><td><strong>Green Valley Orchard Villa</strong></td><td>Yercaud Foothills</td><td>₹2.20 Cr</td><td>640</td><td>22 Leads</td><td><span class="status-pill status-active">Active</span></td><td><button class="btn btn-ghost btn-sm action-404">Manage</button></td></tr>
-              <tr><td><strong>Silver Springs Duplex</strong></td><td>Hasthampatti</td><td>₹1.15 Cr</td><td>298</td><td>9 Leads</td><td><span class="status-pill status-pending">Offer Review</span></td><td><button class="btn btn-ghost btn-sm action-404">Review Offer</button></td></tr>
-              <tr><td><strong>Meyyanur Corporate Plaza</strong></td><td>Meyyanur Commercial</td><td>₹3.40 Cr</td><td>715</td><td>18 Leads</td><td><span class="status-pill status-active">Active</span></td><td><button class="btn btn-ghost btn-sm action-404">Manage</button></td></tr>
+              <tr><td><strong>Fairlands Modern Haven</strong></td><td>Fairlands, Salem</td><td>₹1.65 Cr</td><td>482</td><td>14 Leads</td><td><span class="status-pill status-active">Active</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Manage</a></td></tr>
+              <tr><td><strong>Green Valley Orchard Villa</strong></td><td>Yercaud Foothills</td><td>₹2.20 Cr</td><td>640</td><td>22 Leads</td><td><span class="status-pill status-active">Active</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Manage</a></td></tr>
+              <tr><td><strong>Silver Springs Duplex</strong></td><td>Hasthampatti</td><td>₹1.15 Cr</td><td>298</td><td>9 Leads</td><td><span class="status-pill status-pending">Offer Review</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Review Offer</a></td></tr>
+              <tr><td><strong>Meyyanur Corporate Plaza</strong></td><td>Meyyanur Commercial</td><td>₹3.40 Cr</td><td>715</td><td>18 Leads</td><td><span class="status-pill status-active">Active</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Manage</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -239,15 +336,15 @@ function renderOverviewView(container, user, role) {
       <div class="dash-panel">
         <div class="dash-panel-header">
           <h3 class="dash-panel-title">Formal Purchase Offers Received</h3>
-          <button class="btn btn-outline btn-sm action-404">Download Ledger</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404">Download Ledger</a>
         </div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Buyer Ref</th><th>Property Target</th><th>Offer Price</th><th>Token Proof</th><th>Offer Validity</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>BYR-8421 (NRI London)</strong></td><td>Green Valley Villa</td><td>₹2.15 Cr</td><td><span class="status-pill status-active">₹10L Verified</span></td><td>In 2 Days</td><td><button class="btn btn-primary btn-sm action-404">Accept Offer</button></td></tr>
-              <tr><td><strong>BYR-7729 (Doctor Salem)</strong></td><td>Silver Springs Duplex</td><td>₹1.10 Cr</td><td><span class="status-pill status-active">₹5L Verified</span></td><td>In 4 Days</td><td><button class="btn btn-dark btn-sm action-404">Counter Offer</button></td></tr>
-              <tr><td><strong>BYR-9104 (Tech Founder)</strong></td><td>Fairlands Modern</td><td>₹1.60 Cr</td><td><span class="status-pill status-active">₹15L Verified</span></td><td>In 1 Day</td><td><button class="btn btn-primary btn-sm action-404">Accept Offer</button></td></tr>
+              <tr><td><strong>BYR-8421 (NRI London)</strong></td><td>Green Valley Villa</td><td>₹2.15 Cr</td><td><span class="status-pill status-active">₹10L Verified</span></td><td>In 2 Days</td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Accept Offer</a></td></tr>
+              <tr><td><strong>BYR-7729 (Doctor Salem)</strong></td><td>Silver Springs Duplex</td><td>₹1.10 Cr</td><td><span class="status-pill status-active">₹5L Verified</span></td><td>In 4 Days</td><td><a href="404.html" class="btn btn-dark btn-sm action-404">Counter Offer</a></td></tr>
+              <tr><td><strong>BYR-9104 (Tech Founder)</strong></td><td>Fairlands Modern</td><td>₹1.60 Cr</td><td><span class="status-pill status-active">₹15L Verified</span></td><td>In 1 Day</td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Accept Offer</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -262,14 +359,14 @@ function renderOverviewView(container, user, role) {
             <div class="step-timeline-item done"><div class="step-timeline-title">Buyer Vetting Completed</div><div class="step-timeline-desc">Financial solvency and proof of funds verified.</div></div>
             <div class="step-timeline-item"><div class="step-timeline-title">Site Escort Dispatch</div><div class="step-timeline-desc">Executive chauffeur departs Salem HQ at 10:45 AM.</div></div>
           </div>
-          <button class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">Confirm Schedule</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">Confirm Schedule</a>
         </div>
         <div class="feature-card" style="padding: 1.5rem;">
           <h4 style="font-size: 1.05rem;">Title & Legal Clearance Dossier</h4>
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">All parent deeds (1994-2024), 30-year Encumbrance Certificates, and DTCP sanction orders approved.</p>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 100%;"></div></div>
           <p style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">100% Legal Title Purity Index Verified</p>
-          <button class="btn btn-dark btn-sm action-404" style="margin-top: 0.75rem;">Download Legal Dossier</button>
+          <a href="404.html" class="btn btn-dark btn-sm action-404" style="margin-top: 0.75rem;">Download Legal Dossier</a>
         </div>
       </div>
 
@@ -293,11 +390,11 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Broker Console:</span>
-        <button class="action-chip action-404">+ Add Client Lead</button>
-        <button class="action-chip action-404">Schedule VIP Site Escort</button>
-        <button class="action-chip action-404">Draft Mandate Agreement</button>
-        <button class="action-chip action-404">Commission Calculator</button>
-        <button class="action-chip action-404">Export Pipeline Ledger</button>
+        <a href="404.html" class="action-chip action-404">+ Add Client Lead</a>
+        <a href="404.html" class="action-chip action-404">Schedule VIP Site Escort</a>
+        <a href="404.html" class="action-chip action-404">Draft Mandate Agreement</a>
+        <a href="404.html" class="action-chip action-404">Commission Calculator</a>
+        <a href="404.html" class="action-chip action-404">Export Pipeline Ledger</a>
       </div>
 
       <!-- S1: Agent KPIs -->
@@ -310,15 +407,15 @@ function renderOverviewView(container, user, role) {
 
       <!-- S2: Client Deal Pipeline -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Brokerage Pipeline & Escrow Stage</h3><button class="btn btn-outline btn-sm action-404">Export Pipeline</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Brokerage Pipeline & Escrow Stage</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Export Pipeline</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Client Name</th><th>Property Mandate</th><th>Deal Value</th><th>Pipeline Stage</th><th>Est. Commission</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Mr. Suresh Sundaram</strong></td><td>Beverly Estate Villa</td><td>₹1.85 Cr</td><td><span class="status-pill status-active">Sale Deed Drafted</span></td><td>₹1,85,000</td><td><button class="btn btn-primary btn-sm action-404">Coordinate Registry</button></td></tr>
-              <tr><td><strong>Dr. Meenakshi Raman</strong></td><td>Cyber Commercial Park</td><td>₹3.40 Cr</td><td><span class="status-pill status-pending">Escrow Deposited</span></td><td>₹3,40,000</td><td><button class="btn btn-ghost btn-sm action-404">Inspect Escrow</button></td></tr>
-              <tr><td><strong>Anand Textiles Group</strong></td><td>Salem Ring Road Industrial</td><td>₹4.20 Cr</td><td><span class="status-pill status-pending">Site Inspection</span></td><td>₹4,20,000</td><td><button class="btn btn-ghost btn-sm action-404">Follow Up</button></td></tr>
-              <tr><td><strong>Capt. R. Mohan (NRI)</strong></td><td>Lakeview Palms Villa</td><td>₹2.45 Cr</td><td><span class="status-pill status-active">FEMA PoA Clearance</span></td><td>₹2,45,000</td><td><button class="btn btn-primary btn-sm action-404">Notify Bank</button></td></tr>
+              <tr><td><strong>Mr. Suresh Sundaram</strong></td><td>Beverly Estate Villa</td><td>₹1.85 Cr</td><td><span class="status-pill status-active">Sale Deed Drafted</span></td><td>₹1,85,000</td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Coordinate Registry</a></td></tr>
+              <tr><td><strong>Dr. Meenakshi Raman</strong></td><td>Cyber Commercial Park</td><td>₹3.40 Cr</td><td><span class="status-pill status-pending">Escrow Deposited</span></td><td>₹3,40,000</td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Inspect Escrow</a></td></tr>
+              <tr><td><strong>Anand Textiles Group</strong></td><td>Salem Ring Road Industrial</td><td>₹4.20 Cr</td><td><span class="status-pill status-pending">Site Inspection</span></td><td>₹4,20,000</td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Follow Up</a></td></tr>
+              <tr><td><strong>Capt. R. Mohan (NRI)</strong></td><td>Lakeview Palms Villa</td><td>₹2.45 Cr</td><td><span class="status-pill status-active">FEMA PoA Clearance</span></td><td>₹2,45,000</td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Notify Bank</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -326,14 +423,14 @@ function renderOverviewView(container, user, role) {
 
       <!-- S3: High-Priority Site Inspections Today -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Priority Client Inspections (Today's Roster)</h3><button class="btn btn-dark btn-sm action-404">+ Add Inspection</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Priority Client Inspections (Today's Roster)</h3><a href="404.html" class="btn btn-dark btn-sm action-404">+ Add Inspection</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Time</th><th>Buyer Contact</th><th>Property Target</th><th>Meeting Location</th><th>Escort Vehicle</th><th>Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>02:00 PM</strong></td><td>Ramesh Varma (+91 98401 23456)</td><td>Gokulam Villa 4</td><td>MMR Complex Salem HQ</td><td>Stackly Innova Executive</td><td><span class="status-pill status-active">Confirmed</span></td><td><button class="btn btn-ghost btn-sm action-404">Start Visit</button></td></tr>
-              <tr><td><strong>04:30 PM</strong></td><td>Kavitha Natarajan (+91 99420 88765)</td><td>Fairlands Penthouse</td><td>Fairlands Main Gate</td><td>Client Personal Vehicle</td><td><span class="status-pill status-pending">Vehicle Reserved</span></td><td><button class="btn btn-ghost btn-sm action-404">Call Client</button></td></tr>
-              <tr><td><strong>06:00 PM</strong></td><td>Raghavan K. (+91 94432 11980)</td><td>Chinna Thirupathi Plots</td><td>Site Office</td><td>Chauffeur Sedan</td><td><span class="status-pill status-active">Confirmed</span></td><td><button class="btn btn-ghost btn-sm action-404">Briefing Pack</button></td></tr>
+              <tr><td><strong>02:00 PM</strong></td><td>Ramesh Varma (+91 98401 23456)</td><td>Gokulam Villa 4</td><td>MMR Complex Salem HQ</td><td>Stackly Innova Executive</td><td><span class="status-pill status-active">Confirmed</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Start Visit</a></td></tr>
+              <tr><td><strong>04:30 PM</strong></td><td>Kavitha Natarajan (+91 99420 88765)</td><td>Fairlands Penthouse</td><td>Fairlands Main Gate</td><td>Client Personal Vehicle</td><td><span class="status-pill status-pending">Vehicle Reserved</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Call Client</a></td></tr>
+              <tr><td><strong>06:00 PM</strong></td><td>Raghavan K. (+91 94432 11980)</td><td>Chinna Thirupathi Plots</td><td>Site Office</td><td>Chauffeur Sedan</td><td><span class="status-pill status-active">Confirmed</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Briefing Pack</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -346,19 +443,19 @@ function renderOverviewView(container, user, role) {
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Average sales turnaround on Stackly broker network is 19 days with 98.4% price realization.</p>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 88%;"></div></div>
           <p style="font-size: 0.75rem; color: #64748b;">Target: 85% Quarterly Mandate Clearance (Current: 88%)</p>
-          <button class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Mandates</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Mandates</a>
         </div>
         <div class="feature-card" style="padding: 1.5rem;">
           <h4 style="font-size: 1.05rem;">TN RERA Agent License Compliance</h4>
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">License TN/AGENT/2024/0912 active and verified. Annual compliance filing verified for 2026.</p>
           <div class="info-callout" style="margin: 0.75rem 0;">Status: Full Regulatory Good Standing • Valid until Dec 2028</div>
-          <button class="btn btn-dark btn-sm action-404">View Certificate</button>
+          <a href="404.html" class="btn btn-dark btn-sm action-404">View Certificate</a>
         </div>
       </div>
 
       <!-- S6: Commission Payout Matrix -->
       <div class="dash-panel" style="margin-top: 1.5rem;">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Broker Commission Realization Schedule</h3><button class="btn btn-outline btn-sm action-404">Bank Details</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Broker Commission Realization Schedule</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Bank Details</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Transaction Ref</th><th>Property</th><th>Total Brokerage</th><th>TDS Deducted</th><th>Net Payable</th><th>Disbursement Date</th><th>Status</th></tr></thead>
@@ -375,11 +472,11 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Property Desk:</span>
-        <button class="action-chip action-404">+ Dispatch Vendor</button>
-        <button class="action-chip action-404">Issue Rent Invoices</button>
-        <button class="action-chip action-404">Generate Tenancy Lease</button>
-        <button class="action-chip action-404">Municipal Tax Ledger</button>
-        <button class="action-chip action-404">Emergency Maintenance</button>
+        <a href="404.html" class="action-chip action-404">+ Dispatch Vendor</a>
+        <a href="404.html" class="action-chip action-404">Issue Rent Invoices</a>
+        <a href="404.html" class="action-chip action-404">Generate Tenancy Lease</a>
+        <a href="404.html" class="action-chip action-404">Municipal Tax Ledger</a>
+        <a href="404.html" class="action-chip action-404">Emergency Maintenance</a>
       </div>
 
       <!-- S1: Manager KPIs -->
@@ -392,15 +489,15 @@ function renderOverviewView(container, user, role) {
 
       <!-- S2: Rent Collection Ledger -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Tenancy Rent Escrow & Invoicing Ledger</h3><button class="btn btn-outline btn-sm action-404">Export CSV</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Tenancy Rent Escrow & Invoicing Ledger</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Export CSV</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Property Unit</th><th>Tenant Entity</th><th>Monthly Rent</th><th>Due Date</th><th>Escrow Account</th><th>Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Green Enclave 201</strong></td><td>Vikramaditya Rao</td><td>₹45,000</td><td>1st of Month</td><td>Axis Escrow #9182</td><td><span class="status-pill status-active">Paid On-Time</span></td><td><button class="btn btn-ghost btn-sm action-404">Receipt</button></td></tr>
-              <tr><td><strong>Meyyanur Commercial 3B</strong></td><td>Cognitive Labs Pvt Ltd</td><td>₹1,20,000</td><td>5th of Month</td><td>HDFC Escrow #4102</td><td><span class="status-pill status-active">Paid Direct</span></td><td><button class="btn btn-ghost btn-sm action-404">Receipt</button></td></tr>
-              <tr><td><strong>Fairlands Villa B</strong></td><td>Deepak Chandran</td><td>₹65,000</td><td>7th of Month</td><td>Axis Escrow #9182</td><td><span class="status-pill status-pending">Invoice Sent</span></td><td><button class="btn btn-ghost btn-sm action-404">Send Reminder</button></td></tr>
-              <tr><td><strong>Chinna Thirupathi Retail</strong></td><td>Saravana Store Hub</td><td>₹85,000</td><td>10th of Month</td><td>SBI Escrow #0981</td><td><span class="status-pill status-active">Paid On-Time</span></td><td><button class="btn btn-ghost btn-sm action-404">Receipt</button></td></tr>
+              <tr><td><strong>Green Enclave 201</strong></td><td>Vikramaditya Rao</td><td>₹45,000</td><td>1st of Month</td><td>Axis Escrow #9182</td><td><span class="status-pill status-active">Paid On-Time</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Receipt</a></td></tr>
+              <tr><td><strong>Meyyanur Commercial 3B</strong></td><td>Cognitive Labs Pvt Ltd</td><td>₹1,20,000</td><td>5th of Month</td><td>HDFC Escrow #4102</td><td><span class="status-pill status-active">Paid Direct</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Receipt</a></td></tr>
+              <tr><td><strong>Fairlands Villa B</strong></td><td>Deepak Chandran</td><td>₹65,000</td><td>7th of Month</td><td>Axis Escrow #9182</td><td><span class="status-pill status-pending">Invoice Sent</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Send Reminder</a></td></tr>
+              <tr><td><strong>Chinna Thirupathi Retail</strong></td><td>Saravana Store Hub</td><td>₹85,000</td><td>10th of Month</td><td>SBI Escrow #0981</td><td><span class="status-pill status-active">Paid On-Time</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Receipt</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -408,14 +505,14 @@ function renderOverviewView(container, user, role) {
 
       <!-- S3: Maintenance Work Orders -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Facility Maintenance Tickets</h3><button class="btn btn-primary btn-sm action-404">+ Dispatch Vendor</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Facility Maintenance Tickets</h3><a href="404.html" class="btn btn-primary btn-sm action-404">+ Dispatch Vendor</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Ticket ID</th><th>Property</th><th>Issue Category</th><th>Vendor Assigned</th><th>SLA Timer</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>TKT-412</strong></td><td>Fairlands Villa B</td><td>Water Booster Pump</td><td>Salem Hydro Services</td><td>2 Hours Remaining</td><td><button class="btn btn-ghost btn-sm action-404">Track Vendor</button></td></tr>
-              <tr><td><strong>TKT-408</strong></td><td>Green Enclave</td><td>Elevator Bi-Monthly Service</td><td>Otis Tamil Nadu Desk</td><td>Completed (Pending Signoff)</td><td><button class="btn btn-ghost btn-sm action-404">Approve Invoice</button></td></tr>
-              <tr><td><strong>TKT-399</strong></td><td>Meyyanur Complex</td><td>Fire Safety Sensor Audit</td><td>Salem Safety Systems</td><td>Completed & Certified</td><td><button class="btn btn-ghost btn-sm action-404">View Certificate</button></td></tr>
+              <tr><td><strong>TKT-412</strong></td><td>Fairlands Villa B</td><td>Water Booster Pump</td><td>Salem Hydro Services</td><td>2 Hours Remaining</td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Track Vendor</a></td></tr>
+              <tr><td><strong>TKT-408</strong></td><td>Green Enclave</td><td>Elevator Bi-Monthly Service</td><td>Otis Tamil Nadu Desk</td><td>Completed (Pending Signoff)</td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Approve Invoice</a></td></tr>
+              <tr><td><strong>TKT-399</strong></td><td>Meyyanur Complex</td><td>Fire Safety Sensor Audit</td><td>Salem Safety Systems</td><td>Completed & Certified</td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View Certificate</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -430,20 +527,20 @@ function renderOverviewView(container, user, role) {
             <div class="step-timeline-item done"><div class="step-timeline-title">Cognitive Labs (Meyyanur)</div><div class="step-timeline-desc">Renewal agreement agreed for 36 months.</div></div>
             <div class="step-timeline-item"><div class="step-timeline-title">Deepak Chandran (Fairlands)</div><div class="step-timeline-desc">Draft sent for electronic signature.</div></div>
           </div>
-          <button class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Leases</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Leases</a>
         </div>
         <div class="feature-card" style="padding: 1.5rem;">
           <h4 style="font-size: 1.05rem;">Salem Municipal Tax & Water Charges</h4>
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Salem City Municipal Corporation property tax cleared for Q1 & Q2 2026. Zero penalty backlog.</p>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 100%;"></div></div>
           <p style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">100% Municipal Clearance Challans Active</p>
-          <button class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">Tax Challans</button>
+          <a href="404.html" class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">Tax Challans</a>
         </div>
       </div>
 
       <!-- S6: Vendor Contractors Directory -->
       <div class="dash-panel" style="margin-top: 1.5rem;">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Approved Salem Vendor Contractors</h3><button class="btn btn-outline btn-sm action-404">+ Add Vendor</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Approved Salem Vendor Contractors</h3><a href="404.html" class="btn btn-outline btn-sm action-404">+ Add Vendor</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Contractor Agency</th><th>Service Domain</th><th>Salem Office Location</th><th>Contact Phone</th><th>Rating</th><th>Status</th></tr></thead>
@@ -461,11 +558,11 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">System Control:</span>
-        <button class="action-chip action-404">Verify Pending RERA</button>
-        <button class="action-chip action-404">Audit Bank Escrows</button>
-        <button class="action-chip action-404">Trigger Database Backup</button>
-        <button class="action-chip action-404">Role Access Matrix</button>
-        <button class="action-chip action-404">Server Logs</button>
+        <a href="404.html" class="action-chip action-404">Verify Pending RERA</a>
+        <a href="404.html" class="action-chip action-404">Audit Bank Escrows</a>
+        <a href="404.html" class="action-chip action-404">Trigger Database Backup</a>
+        <a href="404.html" class="action-chip action-404">Role Access Matrix</a>
+        <a href="404.html" class="action-chip action-404">Server Logs</a>
       </div>
 
       <!-- S1: Admin Platform KPIs -->
@@ -478,15 +575,15 @@ function renderOverviewView(container, user, role) {
 
       <!-- S2: Role Telemetry & User Governance -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Platform User & Role Governance Directory</h3><button class="btn btn-outline btn-sm action-404">Export User Registry</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Platform User & Role Governance Directory</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Export User Registry</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>User Entity</th><th>Assigned Role</th><th>City / Location</th><th>Registered Date</th><th>KYC Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Prakash Narayanan</strong></td><td>Verified Seller</td><td>Salem Central</td><td>14 Mar 2026</td><td><span class="status-pill status-active">Aadhaar & Patta Verified</span></td><td><button class="btn btn-ghost btn-sm action-404">Audit User</button></td></tr>
-              <tr><td><strong>Karthik Raja & Team</strong></td><td>Licensed Agent</td><td>MMR Complex Salem</td><td>10 Jan 2026</td><td><span class="status-pill status-active">RERA Certified</span></td><td><button class="btn btn-ghost btn-sm action-404">Audit User</button></td></tr>
-              <tr><td><strong>Vigneshwara Realty</strong></td><td>Property Manager</td><td>Hasthampatti Salem</td><td>02 Feb 2026</td><td><span class="status-pill status-active">Corporate Escrow Active</span></td><td><button class="btn btn-ghost btn-sm action-404">Audit User</button></td></tr>
-              <tr><td><strong>Deepak Kumar</strong></td><td>Active Buyer</td><td>Chinna Thirupathi</td><td>20 Mar 2026</td><td><span class="status-pill status-active">Identity Verified</span></td><td><button class="btn btn-ghost btn-sm action-404">Audit User</button></td></tr>
+              <tr><td><strong>Prakash Narayanan</strong></td><td>Verified Seller</td><td>Salem Central</td><td>14 Mar 2026</td><td><span class="status-pill status-active">Aadhaar & Patta Verified</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Audit User</a></td></tr>
+              <tr><td><strong>Karthik Raja & Team</strong></td><td>Licensed Agent</td><td>MMR Complex Salem</td><td>10 Jan 2026</td><td><span class="status-pill status-active">RERA Certified</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Audit User</a></td></tr>
+              <tr><td><strong>Vigneshwara Realty</strong></td><td>Property Manager</td><td>Hasthampatti Salem</td><td>02 Feb 2026</td><td><span class="status-pill status-active">Corporate Escrow Active</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Audit User</a></td></tr>
+              <tr><td><strong>Deepak Kumar</strong></td><td>Active Buyer</td><td>Chinna Thirupathi</td><td>20 Mar 2026</td><td><span class="status-pill status-active">Identity Verified</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Audit User</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -494,14 +591,14 @@ function renderOverviewView(container, user, role) {
 
       <!-- S3: High-Risk Escrow Monitor -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Institutional Escrow Accounts Monitor</h3><button class="btn btn-dark btn-sm action-404">Bank Reconciliation</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Institutional Escrow Accounts Monitor</h3><a href="404.html" class="btn btn-dark btn-sm action-404">Bank Reconciliation</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Escrow ID</th><th>Property Transaction</th><th>Deposit Bank</th><th>Escrow Balance</th><th>Audit Trail</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>ESC-901</strong></td><td>Beverly Estate Villa 2</td><td>Axis Bank Chinna Thirupathi</td><td>₹25,00,000</td><td><span class="status-pill status-active">Clean Clearance</span></td><td><button class="btn btn-ghost btn-sm action-404">View Ledger</button></td></tr>
-              <tr><td><strong>ESC-892</strong></td><td>Fairlands Heights High-Rise</td><td>HDFC Bank Salem Main</td><td>₹1,10,00,000</td><td><span class="status-pill status-active">Institutional Mandate</span></td><td><button class="btn btn-ghost btn-sm action-404">View Ledger</button></td></tr>
-              <tr><td><strong>ESC-870</strong></td><td>Yercaud Foothills Retreat</td><td>ICICI Bank Meyyanur</td><td>₹45,00,000</td><td><span class="status-pill status-active">Clean Clearance</span></td><td><button class="btn btn-ghost btn-sm action-404">View Ledger</button></td></tr>
+              <tr><td><strong>ESC-901</strong></td><td>Beverly Estate Villa 2</td><td>Axis Bank Chinna Thirupathi</td><td>₹25,00,000</td><td><span class="status-pill status-active">Clean Clearance</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View Ledger</a></td></tr>
+              <tr><td><strong>ESC-892</strong></td><td>Fairlands Heights High-Rise</td><td>HDFC Bank Salem Main</td><td>₹1,10,00,000</td><td><span class="status-pill status-active">Institutional Mandate</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View Ledger</a></td></tr>
+              <tr><td><strong>ESC-870</strong></td><td>Yercaud Foothills Retreat</td><td>ICICI Bank Meyyanur</td><td>₹45,00,000</td><td><span class="status-pill status-active">Clean Clearance</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View Ledger</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -514,13 +611,13 @@ function renderOverviewView(container, user, role) {
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">4 new builder projects awaiting DTCP and survey number clearance before homepage featuring.</p>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 75%;"></div></div>
           <p style="font-size: 0.75rem; color: #64748b;">75% of submissions approved this week</p>
-          <button class="btn btn-primary btn-sm action-404" style="margin-top: 1rem;">Inspect Queue</button>
+          <a href="404.html" class="btn btn-primary btn-sm action-404" style="margin-top: 1rem;">Inspect Queue</a>
         </div>
         <div class="feature-card" style="padding: 1.5rem;">
           <h4 style="font-size: 1.05rem;">Database Vault & Cloud Backups</h4>
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Automated real-time PostgreSQL replication, 256-bit AES encryption active across all deed PDFs.</p>
           <div class="info-callout" style="margin: 0.75rem 0;">Last Full Snapshot: 12 minutes ago (Zero Data Loss Protocol)</div>
-          <button class="btn btn-dark btn-sm action-404">System Logs</button>
+          <a href="404.html" class="btn btn-dark btn-sm action-404">System Logs</a>
         </div>
       </div>
 
@@ -545,11 +642,11 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Buyer Shortcuts:</span>
-        <button class="action-chip action-404">+ Request VIP Site Tour</button>
-        <button class="action-chip action-404">Compare Shortlist</button>
-        <button class="action-chip action-404">Download Loan Sanction</button>
-        <button class="action-chip action-404">Title Verification Lookup</button>
-        <button class="action-chip action-404">Talk to Concierge</button>
+        <a href="404.html" class="action-chip action-404">+ Request VIP Site Tour</a>
+        <a href="404.html" class="action-chip action-404">Compare Shortlist</a>
+        <a href="404.html" class="action-chip action-404">Download Loan Sanction</a>
+        <a href="404.html" class="action-chip action-404">Title Verification Lookup</a>
+        <a href="404.html" class="action-chip action-404">Talk to Concierge</a>
       </div>
 
       <!-- S1: Buyer KPIs -->
@@ -564,16 +661,16 @@ function renderOverviewView(container, user, role) {
       <div class="dash-panel">
         <div class="dash-panel-header">
           <h3 class="dash-panel-title">My Shortlisted Luxury Sanctuaries</h3>
-          <button class="btn btn-outline btn-sm action-404">Compare All (4)</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404">Compare All (4)</a>
         </div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Property Name</th><th>Locality</th><th>Configurations</th><th>Price</th><th>Title Purity</th><th>Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Grand Beverly Hills Manor</strong></td><td>Hasthampatti, Salem</td><td>4 BHK • 3,850 sq.ft</td><td>₹1.85 Cr</td><td><span class="status-pill status-active">Clear Title 30Y</span></td><td><span class="status-pill status-active">Available</span></td><td><button class="btn btn-primary btn-sm action-404">Schedule Tour</button></td></tr>
-              <tr><td><strong>Lakeview Palms Private Villa</strong></td><td>Yercaud Foothills</td><td>5 BHK • 4,200 sq.ft</td><td>₹2.45 Cr</td><td><span class="status-pill status-active">DTCP Approved</span></td><td><span class="status-pill status-active">Available</span></td><td><button class="btn btn-primary btn-sm action-404">Schedule Tour</button></td></tr>
-              <tr><td><strong>Fairlands Modern Enclave</strong></td><td>Fairlands, Salem</td><td>3 BHK • 2,400 sq.ft</td><td>₹1.40 Cr</td><td><span class="status-pill status-active">RERA Registered</span></td><td><span class="status-pill status-active">Available</span></td><td><button class="btn btn-primary btn-sm action-404">Schedule Tour</button></td></tr>
-              <tr><td><strong>Emerald Hillview Penthouse</strong></td><td>Alagapuram, Salem</td><td>4 BHK • 3,100 sq.ft</td><td>₹1.75 Cr</td><td><span class="status-pill status-active">Clear Title 30Y</span></td><td><span class="status-pill status-pending">Offer in Review</span></td><td><button class="btn btn-primary btn-sm action-404">Schedule Tour</button></td></tr>
+              <tr><td><strong>Grand Beverly Hills Manor</strong></td><td>Hasthampatti, Salem</td><td>4 BHK • 3,850 sq.ft</td><td>₹1.85 Cr</td><td><span class="status-pill status-active">Clear Title 30Y</span></td><td><span class="status-pill status-active">Available</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Schedule Tour</a></td></tr>
+              <tr><td><strong>Lakeview Palms Private Villa</strong></td><td>Yercaud Foothills</td><td>5 BHK • 4,200 sq.ft</td><td>₹2.45 Cr</td><td><span class="status-pill status-active">DTCP Approved</span></td><td><span class="status-pill status-active">Available</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Schedule Tour</a></td></tr>
+              <tr><td><strong>Fairlands Modern Enclave</strong></td><td>Fairlands, Salem</td><td>3 BHK • 2,400 sq.ft</td><td>₹1.40 Cr</td><td><span class="status-pill status-active">RERA Registered</span></td><td><span class="status-pill status-active">Available</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Schedule Tour</a></td></tr>
+              <tr><td><strong>Emerald Hillview Penthouse</strong></td><td>Alagapuram, Salem</td><td>4 BHK • 3,100 sq.ft</td><td>₹1.75 Cr</td><td><span class="status-pill status-active">Clear Title 30Y</span></td><td><span class="status-pill status-pending">Offer in Review</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Schedule Tour</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -581,14 +678,14 @@ function renderOverviewView(container, user, role) {
 
       <!-- S3: Scheduled VIP Site Tours -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Upcoming VIP Accompanied Site Tours</h3><button class="btn btn-dark btn-sm action-404">+ Request New Visit</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Upcoming VIP Accompanied Site Tours</h3><a href="404.html" class="btn btn-dark btn-sm action-404">+ Request New Visit</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Date & Time</th><th>Property Target</th><th>Senior Advisor</th><th>Chauffeur Pickup</th><th>Tour Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Tomorrow, 11:00 AM</strong></td><td>Grand Beverly Hills Manor</td><td>Karthik Raja (Principal Broker)</td><td>Salem Junction Executive Lounge</td><td><span class="status-pill status-active">Confirmed</span></td><td><button class="btn btn-ghost btn-sm action-404">Reschedule</button></td></tr>
-              <tr><td><strong>Saturday, 03:30 PM</strong></td><td>Lakeview Palms Villa</td><td>Ananya Sharma (Sales Director)</td><td>Hotel Radisson Salem Lobby</td><td><span class="status-pill status-pending">Vehicle Reserved</span></td><td><button class="btn btn-ghost btn-sm action-404">Call Driver</button></td></tr>
-              <tr><td><strong>Next Tuesday, 10:00 AM</strong></td><td>Fairlands Modern Enclave</td><td>Karthik Raja (Principal Broker)</td><td>Fairlands Main Gate</td><td><span class="status-pill status-active">Confirmed</span></td><td><button class="btn btn-ghost btn-sm action-404">Details</button></td></tr>
+              <tr><td><strong>Tomorrow, 11:00 AM</strong></td><td>Grand Beverly Hills Manor</td><td>Karthik Raja (Principal Broker)</td><td>Salem Junction Executive Lounge</td><td><span class="status-pill status-active">Confirmed</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Reschedule</a></td></tr>
+              <tr><td><strong>Saturday, 03:30 PM</strong></td><td>Lakeview Palms Villa</td><td>Ananya Sharma (Sales Director)</td><td>Hotel Radisson Salem Lobby</td><td><span class="status-pill status-pending">Vehicle Reserved</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Call Driver</a></td></tr>
+              <tr><td><strong>Next Tuesday, 10:00 AM</strong></td><td>Fairlands Modern Enclave</td><td>Karthik Raja (Principal Broker)</td><td>Fairlands Main Gate</td><td><span class="status-pill status-active">Confirmed</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Details</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -601,13 +698,13 @@ function renderOverviewView(container, user, role) {
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Sanction Letter issued by HDFC Bank Salem Branch. Interest locked at 8.40% p.a. for 60 days.</p>
           <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 100%;"></div></div>
           <p style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">Sanctioned Amount: ₹2,20,00,000 (Ready for Disbursement)</p>
-          <button class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">Download Sanction Letter</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">Download Sanction Letter</a>
         </div>
         <div class="feature-card" style="padding: 1.5rem;">
           <h4 style="font-size: 1.05rem;">Title Audit & Encumbrance Verification</h4>
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Stackly legal panel has conducted 30-year deed traces for all your shortlisted properties.</p>
           <div class="info-callout" style="margin: 0.75rem 0;">Status: Zero Litigation • Encumbrance Certificate (EC) Nil verified until 2026</div>
-          <button class="btn btn-dark btn-sm action-404">View Legal Clearance</button>
+          <a href="404.html" class="btn btn-dark btn-sm action-404">View Legal Clearance</a>
         </div>
       </div>
 
@@ -639,10 +736,10 @@ function renderPortfolioView(container, user, role) {
     container.innerHTML = `
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Portfolio Tools:</span>
-        <button class="action-chip action-404">+ Add New Property</button>
-        <button class="action-chip action-404">Download Valuation Dossier</button>
-        <button class="action-chip action-404">Manage Digital 3D Tour</button>
-        <button class="action-chip action-404">Export Tax Records</button>
+        <a href="404.html" class="action-chip action-404">+ Add New Property</a>
+        <a href="404.html" class="action-chip action-404">Download Valuation Dossier</a>
+        <a href="404.html" class="action-chip action-404">Manage Digital 3D Tour</a>
+        <a href="404.html" class="action-chip action-404">Export Tax Records</a>
       </div>
 
       <!-- S1: Portfolio Valuation Summary -->
@@ -655,14 +752,14 @@ function renderPortfolioView(container, user, role) {
 
       <!-- S2: My Properties Detailed Table -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Property Inventory Under Mandate</h3><button class="btn btn-primary btn-sm action-404">+ Add New Property</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Property Inventory Under Mandate</h3><a href="404.html" class="btn btn-primary btn-sm action-404">+ Add New Property</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Property Name</th><th>Category</th><th>Survey Number</th><th>Asking Price</th><th>Leads Generated</th><th>Status</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Fairlands Modern Haven</strong></td><td>Independent Villa</td><td>SF-184/2A</td><td>₹1.65 Cr</td><td>28 Leads</td><td><span class="status-pill status-active">Active</span></td><td><button class="btn btn-ghost btn-sm action-404">Edit Details</button></td></tr>
-              <tr><td><strong>Green Valley Orchard Villa</strong></td><td>Luxury Villa</td><td>SF-92/4B</td><td>₹2.20 Cr</td><td>41 Leads</td><td><span class="status-pill status-active">Active</span></td><td><button class="btn btn-ghost btn-sm action-404">Edit Details</button></td></tr>
-              <tr><td><strong>Silver Springs Duplex</strong></td><td>Duplex Flat</td><td>SF-310/1C</td><td>₹1.15 Cr</td><td>19 Leads</td><td><span class="status-pill status-pending">Offer Review</span></td><td><button class="btn btn-ghost btn-sm action-404">Edit Details</button></td></tr>
+              <tr><td><strong>Fairlands Modern Haven</strong></td><td>Independent Villa</td><td>SF-184/2A</td><td>₹1.65 Cr</td><td>28 Leads</td><td><span class="status-pill status-active">Active</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Edit Details</a></td></tr>
+              <tr><td><strong>Green Valley Orchard Villa</strong></td><td>Luxury Villa</td><td>SF-92/4B</td><td>₹2.20 Cr</td><td>41 Leads</td><td><span class="status-pill status-active">Active</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Edit Details</a></td></tr>
+              <tr><td><strong>Silver Springs Duplex</strong></td><td>Duplex Flat</td><td>SF-310/1C</td><td>₹1.15 Cr</td><td>19 Leads</td><td><span class="status-pill status-pending">Offer Review</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Edit Details</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -670,7 +767,7 @@ function renderPortfolioView(container, user, role) {
 
       <!-- S3: CMA Price Optimization -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Comparative Market Analysis (CMA) Benchmarks</h3><button class="btn btn-outline btn-sm action-404">Re-evaluate Price</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Comparative Market Analysis (CMA) Benchmarks</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Re-evaluate Price</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Locality</th><th>Average Sold Price</th><th>Stackly Recommended Rate</th><th>Buyer Demand Index</th><th>Projected Days to Close</th></tr></thead>
@@ -692,13 +789,13 @@ function renderPortfolioView(container, user, role) {
             <div class="step-timeline-item done"><div class="step-timeline-title">Aerial Drone Video</div><div class="step-timeline-desc">Captured in 4K 60fps with boundary overlays.</div></div>
             <div class="step-timeline-item done"><div class="step-timeline-title">Matterport 3D Walkthrough</div><div class="step-timeline-desc">Live on listing page with 1,240 views.</div></div>
           </div>
-          <button class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Media Kit</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Media Kit</a>
         </div>
         <div class="feature-card" style="padding: 1.5rem;">
           <h4 style="font-size: 1.05rem;">Seller Settlement & Escrow Vault</h4>
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Dedicated bank escrow vault configured with HDFC Bank Salem for automatic closing disbursements.</p>
           <div class="info-callout" style="margin: 0.75rem 0;">Escrow Bank: HDFC Chinna Thirupathi • A/C #****8821 • Status: Verified</div>
-          <button class="btn btn-dark btn-sm action-404">View Banking Setup</button>
+          <a href="404.html" class="btn btn-dark btn-sm action-404">View Banking Setup</a>
         </div>
       </div>
 
@@ -709,8 +806,8 @@ function renderPortfolioView(container, user, role) {
           <table class="data-table">
             <thead><tr><th>Property Name</th><th>Certified Engineer</th><th>Inspection Date</th><th>Structural Rating</th><th>Certificate</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Fairlands Modern Haven</strong></td><td>Er. S. Velmurugan M.E.</td><td>15 Feb 2026</td><td>Grade A+ (Pristine)</td><td>ST-2026-091</td><td><button class="btn btn-ghost btn-sm action-404">Download</button></td></tr>
-              <tr><td><strong>Green Valley Villa</strong></td><td>Er. R. Soundarajan M.E.</td><td>10 Jan 2026</td><td>Grade A+ (Pristine)</td><td>ST-2026-042</td><td><button class="btn btn-ghost btn-sm action-404">Download</button></td></tr>
+              <tr><td><strong>Fairlands Modern Haven</strong></td><td>Er. S. Velmurugan M.E.</td><td>15 Feb 2026</td><td>Grade A+ (Pristine)</td><td>ST-2026-091</td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Download</a></td></tr>
+              <tr><td><strong>Green Valley Villa</strong></td><td>Er. R. Soundarajan M.E.</td><td>10 Jan 2026</td><td>Grade A+ (Pristine)</td><td>ST-2026-042</td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Download</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -721,10 +818,10 @@ function renderPortfolioView(container, user, role) {
     container.innerHTML = `
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Portfolio Tools:</span>
-        <button class="action-chip action-404">Download Title Dossier</button>
-        <button class="action-chip action-404">Export Acquisition Ledger</button>
-        <button class="action-chip action-404">Book Surveyor Visit</button>
-        <button class="action-chip action-404">Request 3D Blueprints</button>
+        <a href="404.html" class="action-chip action-404">Download Title Dossier</a>
+        <a href="404.html" class="action-chip action-404">Export Acquisition Ledger</a>
+        <a href="404.html" class="action-chip action-404">Book Surveyor Visit</a>
+        <a href="404.html" class="action-chip action-404">Request 3D Blueprints</a>
       </div>
 
       <!-- S1: Buyer Portfolio KPIs -->
@@ -737,13 +834,13 @@ function renderPortfolioView(container, user, role) {
 
       <!-- S2: Acquired Assets Registry Table -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">My Real Estate Assets & Registry Deeds</h3><button class="btn btn-outline btn-sm action-404">Download Deeds</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">My Real Estate Assets & Registry Deeds</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Download Deeds</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Property Name</th><th>Sub-Registrar Doc #</th><th>Purchase Date</th><th>Acquisition Value</th><th>Current Valuation</th><th>Occupancy</th><th>Action</th></tr></thead>
             <tbody>
-              <tr><td><strong>Gokulam Estate Villa 4</strong></td><td>DOC-2024-4819</td><td>14 Nov 2024</td><td>₹1.85 Cr</td><td>₹2.10 Cr</td><td><span class="status-pill status-active">Self Occupied</span></td><td><button class="btn btn-ghost btn-sm action-404">Deed Vault</button></td></tr>
-              <tr><td><strong>Fairlands Commercial Suite</strong></td><td>DOC-2025-1022</td><td>22 May 2025</td><td>₹1.40 Cr</td><td>₹1.53 Cr</td><td><span class="status-pill status-active">Leased (₹65k/mo)</span></td><td><button class="btn btn-ghost btn-sm action-404">Deed Vault</button></td></tr>
+              <tr><td><strong>Gokulam Estate Villa 4</strong></td><td>DOC-2024-4819</td><td>14 Nov 2024</td><td>₹1.85 Cr</td><td>₹2.10 Cr</td><td><span class="status-pill status-active">Self Occupied</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Deed Vault</a></td></tr>
+              <tr><td><strong>Fairlands Commercial Suite</strong></td><td>DOC-2025-1022</td><td>22 May 2025</td><td>₹1.40 Cr</td><td>₹1.53 Cr</td><td><span class="status-pill status-active">Leased (₹65k/mo)</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Deed Vault</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -751,7 +848,7 @@ function renderPortfolioView(container, user, role) {
 
       <!-- S3: Property Comparison Matrix -->
       <div class="dash-panel">
-        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Shortlist Comparative Evaluation</h3><button class="btn btn-dark btn-sm action-404">+ Add to Compare</button></div>
+        <div class="dash-panel-header"><h3 class="dash-panel-title">Active Shortlist Comparative Evaluation</h3><a href="404.html" class="btn btn-dark btn-sm action-404">+ Add to Compare</a></div>
         <div class="table-responsive">
           <table class="data-table">
             <thead><tr><th>Feature Parameter</th><th>Grand Beverly Manor</th><th>Lakeview Palms Villa</th><th>Fairlands Enclave</th></tr></thead>
@@ -760,7 +857,7 @@ function renderPortfolioView(container, user, role) {
               <tr><td><strong>Price Per Sq.Ft</strong></td><td>₹4,805 / sq.ft</td><td>₹5,833 / sq.ft</td><td>₹5,833 / sq.ft</td></tr>
               <tr><td><strong>Private Amenities</strong></td><td>Private Pool, Home Theater</td><td>Infinity Lawn, Tennis Court</td><td>Clubhouse, Rooftop Gym</td></tr>
               <tr><td><strong>Title Search Status</strong></td><td>30Y Clear Title Verified</td><td>DTCP Sanctioned</td><td>RERA Registered</td></tr>
-              <tr><td><strong>Action</strong></td><td><button class="btn btn-primary btn-sm action-404">Proceed to Token</button></td><td><button class="btn btn-primary btn-sm action-404">Proceed to Token</button></td><td><button class="btn btn-primary btn-sm action-404">Proceed to Token</button></td></tr>
+              <tr><td><strong>Action</strong></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Proceed to Token</a></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Proceed to Token</a></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Proceed to Token</a></td></tr>
             </tbody>
           </table>
         </div>
@@ -775,13 +872,13 @@ function renderPortfolioView(container, user, role) {
             <div class="step-timeline-item done"><div class="step-timeline-title">Nil Encumbrance 1994-2026</div><div class="step-timeline-desc">Sub-Registrar Chinna Thirupathi Certified.</div></div>
             <div class="step-timeline-item done"><div class="step-timeline-title">Patta & Chitta Transfer</div><div class="step-timeline-desc">Salem West Taluk Revenue Record verified.</div></div>
           </div>
-          <button class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">Open Document Vault</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">Open Document Vault</a>
         </div>
         <div class="feature-card" style="padding: 1.5rem;">
           <h4 style="font-size: 1.05rem;">Active Escrow Hold & Token Status</h4>
           <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">₹10,00,000 earnest deposit is locked in Axis Bank Escrow for Grand Beverly Hills Manor pending final sale agreement.</p>
           <div class="info-callout" style="margin: 0.75rem 0;">Deposit ID: ESC-2026-991 • Valid until: 15 Oct 2026 • Status: Fully Refundable</div>
-          <button class="btn btn-dark btn-sm action-404">Escrow Statement</button>
+          <a href="404.html" class="btn btn-dark btn-sm action-404">Escrow Statement</a>
         </div>
       </div>
 
@@ -810,10 +907,10 @@ function renderLeadsView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Leads Management:</span>
-      <button class="action-chip action-404">+ Add Inbound Inquiry</button>
-      <button class="action-chip action-404">Export CRM Records</button>
-      <button class="action-chip action-404">Broadcast WhatsApp Alert</button>
-      <button class="action-chip action-404">Schedule Follow-up Call</button>
+      <a href="404.html" class="action-chip action-404">+ Add Inbound Inquiry</a>
+      <a href="404.html" class="action-chip action-404">Export CRM Records</a>
+      <a href="404.html" class="action-chip action-404">Broadcast WhatsApp Alert</a>
+      <a href="404.html" class="action-chip action-404">Schedule Follow-up Call</a>
     </div>
 
     <!-- S1: Leads & Inquiries KPIs -->
@@ -826,43 +923,177 @@ function renderLeadsView(container, user, role) {
 
     <!-- S2: Active CRM Pipeline Table -->
     <div class="dash-panel">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">Active Prospect Stream & Engagement Queue</h3><button class="btn btn-outline btn-sm action-404">Export CSV</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">Active Prospect Stream & Engagement Queue</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Export CSV</a></div>
       <div class="table-responsive">
         <table class="data-table">
           <thead><tr><th>Prospect Entity</th><th>Interested Property</th><th>Allocated Budget</th><th>Source Channel</th><th>Stage</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><strong>Dr. Meenakshi Sundaram</strong></td><td>Grand Beverly Hills Manor</td><td>₹2.00 Cr</td><td>Website Direct</td><td><span class="status-pill status-active">VIP Tour Tomorrow</span></td><td><button class="btn btn-primary btn-sm action-404">Call Client</button></td></tr>
-            <tr><td><strong>Arunachalam & Co (NRI London)</strong></td><td>Lakeview Palms Villa</td><td>₹2.50 Cr</td><td>NRI Advisory Desk</td><td><span class="status-pill status-pending">Legal Due Diligence</span></td><td><button class="btn btn-ghost btn-sm action-404">Send Dossier</button></td></tr>
-            <tr><td><strong>Senthil Kumar (Salem Industrialist)</strong></td><td>Meyyanur Commercial</td><td>₹3.50 Cr</td><td>Exclusive Referral</td><td><span class="status-pill status-active">Counter-Offer Stage</span></td><td><button class="btn btn-primary btn-sm action-404">Review Offer</button></td></tr>
-            <tr><td><strong>Kavitha Natarajan</strong></td><td>Fairlands Modern Enclave</td><td>₹1.50 Cr</td><td>Walk-in Salem HQ</td><td><span class="status-pill status-pending">Initial Showing</span></td><td><button class="btn btn-ghost btn-sm action-404">Schedule Tour</button></td></tr>
+            <tr><td><strong>Dr. Meenakshi Sundaram</strong></td><td>Grand Beverly Hills Manor</td><td>₹2.00 Cr</td><td>Website Direct</td><td><span class="status-pill status-active">VIP Tour Tomorrow</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Call Client</a></td></tr>
+            <tr><td><strong>Arunachalam & Co (NRI London)</strong></td><td>Lakeview Palms Villa</td><td>₹2.50 Cr</td><td>NRI Advisory Desk</td><td><span class="status-pill status-pending">Legal Due Diligence</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Send Dossier</a></td></tr>
+            <tr><td><strong>Senthil Kumar (Salem Industrialist)</strong></td><td>Meyyanur Commercial</td><td>₹3.50 Cr</td><td>Exclusive Referral</td><td><span class="status-pill status-active">Counter-Offer Stage</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Review Offer</a></td></tr>
+            <tr><td><strong>Kavitha Natarajan</strong></td><td>Fairlands Modern Enclave</td><td>₹1.50 Cr</td><td>Walk-in Salem HQ</td><td><span class="status-pill status-pending">Initial Showing</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Schedule Tour</a></td></tr>
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- S3: Lead Heatmap by Locality -->
-    <div class="dash-panel">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">Buyer Inquiries by Salem Sub-Markets</h3></div>
-      <div class="chart-container">
-        <div class="chart-bar-group">
-          <div class="chart-bar-value">38%</div>
-          <div class="chart-bar" style="height: 180px;"></div>
-          <div class="chart-bar-label">Fairlands Enclaves</div>
+    <!-- S3: Buyer Inquiries by Salem Sub-Markets (Restyled Luxury Telemetry) -->
+    <div class="submarket-inquiries-panel">
+      <div class="submarket-header">
+        <div class="submarket-header-title-wrap">
+          <h3 class="submarket-title">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--color-primary);"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            Buyer Inquiries by Salem Sub-Markets
+          </h3>
+          <p class="submarket-subtitle">Live Prospective Demand &amp; Inspection Velocity Breakdown across Key Residential Corridors (Q3 2026)</p>
         </div>
-        <div class="chart-bar-group">
-          <div class="chart-bar-value">27%</div>
-          <div class="chart-bar" style="height: 135px;"></div>
-          <div class="chart-bar-label">Hasthampatti Villas</div>
+        <div class="yield-header-badges">
+          <span class="submarket-tag submarket-tag-primary">Fairlands Lead: +14% MoM</span>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="color:#ffffff; border-color: rgba(255,255,255,0.25);">Export Matrix</a>
+          <a href="404.html" class="btn btn-primary btn-sm action-404">Heatmap Telemetry</a>
         </div>
-        <div class="chart-bar-group">
-          <div class="chart-bar-value">21%</div>
-          <div class="chart-bar" style="height: 105px;"></div>
-          <div class="chart-bar-label">Chinna Thirupathi Plots</div>
+      </div>
+
+      <div class="submarket-grid">
+        <!-- Locality 1: Fairlands Enclaves -->
+        <div class="submarket-card">
+          <div>
+            <div class="submarket-card-header">
+              <span class="submarket-locality">Fairlands Enclaves</span>
+              <span class="submarket-tag submarket-tag-primary">Prime Corridor</span>
+            </div>
+            <div class="submarket-share-val">38%</div>
+            <div class="submarket-share-label">Market Demand Share</div>
+            <div class="submarket-bar-track">
+              <div class="submarket-bar-fill" style="width: 38%;"></div>
+            </div>
+          </div>
+          <div class="submarket-metrics-list">
+            <div class="submarket-metric-item">
+              <span>Pipeline Leads</span>
+              <strong>48 Prospects</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Avg Inquiry Budget</span>
+              <strong>₹1.85 Cr – ₹2.80 Cr</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Weekly Tours</span>
+              <strong>14 VIP Visits</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Capital Growth</span>
+              <strong style="color: #557800;">+9.2% YoY</strong>
+            </div>
+          </div>
         </div>
-        <div class="chart-bar-group">
-          <div class="chart-bar-value">14%</div>
-          <div class="chart-bar" style="height: 70px;"></div>
-          <div class="chart-bar-label">Yercaud Foothills</div>
+
+        <!-- Locality 2: Hasthampatti Luxury Villas -->
+        <div class="submarket-card">
+          <div>
+            <div class="submarket-card-header">
+              <span class="submarket-locality">Hasthampatti Villas</span>
+              <span class="submarket-tag submarket-tag-gold">NRI Favorite</span>
+            </div>
+            <div class="submarket-share-val">27%</div>
+            <div class="submarket-share-label">Market Demand Share</div>
+            <div class="submarket-bar-track">
+              <div class="submarket-bar-fill" style="width: 27%;"></div>
+            </div>
+          </div>
+          <div class="submarket-metrics-list">
+            <div class="submarket-metric-item">
+              <span>Pipeline Leads</span>
+              <strong>34 Prospects</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Avg Inquiry Budget</span>
+              <strong>₹2.10 Cr – ₹3.50 Cr</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Weekly Tours</span>
+              <strong>10 VIP Visits</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Capital Growth</span>
+              <strong style="color: #557800;">+6.5% YoY</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Locality 3: Chinna Thirupathi Tech Corridor -->
+        <div class="submarket-card">
+          <div>
+            <div class="submarket-card-header">
+              <span class="submarket-locality">Chinna Thirupathi</span>
+              <span class="submarket-tag submarket-tag-blue">Fastest Velocity</span>
+            </div>
+            <div class="submarket-share-val">21%</div>
+            <div class="submarket-share-label">Market Demand Share</div>
+            <div class="submarket-bar-track">
+              <div class="submarket-bar-fill" style="width: 21%;"></div>
+            </div>
+          </div>
+          <div class="submarket-metrics-list">
+            <div class="submarket-metric-item">
+              <span>Pipeline Leads</span>
+              <strong>27 Prospects</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Avg Inquiry Budget</span>
+              <strong>₹85 L – ₹1.45 Cr</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Weekly Tours</span>
+              <strong>8 VIP Visits</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Capital Growth</span>
+              <strong style="color: #557800;">+10.1% YoY</strong>
+            </div>
+          </div>
+        </div>
+
+        <!-- Locality 4: Yercaud Foothills Sanctuaries -->
+        <div class="submarket-card">
+          <div>
+            <div class="submarket-card-header">
+              <span class="submarket-locality">Yercaud Foothills</span>
+              <span class="submarket-tag submarket-tag-primary">Eco Sanctuaries</span>
+            </div>
+            <div class="submarket-share-val">14%</div>
+            <div class="submarket-share-label">Market Demand Share</div>
+            <div class="submarket-bar-track">
+              <div class="submarket-bar-fill" style="width: 14%;"></div>
+            </div>
+          </div>
+          <div class="submarket-metrics-list">
+            <div class="submarket-metric-item">
+              <span>Pipeline Leads</span>
+              <strong>18 Prospects</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Avg Inquiry Budget</span>
+              <strong>₹2.40 Cr – ₹4.50 Cr</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Weekly Tours</span>
+              <strong>5 VIP Visits</strong>
+            </div>
+            <div class="submarket-metric-item">
+              <span>Capital Growth</span>
+              <strong style="color: #557800;">+11.8% YoY</strong>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="submarket-insight-footer">
+        <div>
+          <strong>Institutional Advisory Note:</strong> Fairlands Enclaves and Hasthampatti represent 65% of all HNI private site inspection requests across Salem in Q3 2026.
+        </div>
+        <div style="font-weight: 600; color: var(--color-dark);">
+          Aggregated Tour Conversion: 28.4%
         </div>
       </div>
     </div>
@@ -876,19 +1107,19 @@ function renderLeadsView(container, user, role) {
           <div class="step-timeline-item done"><div class="step-timeline-title">Call with Dr. Meenakshi (11:00 AM)</div><div class="step-timeline-desc">Confirmed chauffeur pickup at Salem Junction for 11:30 AM tour.</div></div>
           <div class="step-timeline-item done"><div class="step-timeline-title">FEMA Briefing for Arunachalam (09:30 AM)</div><div class="step-timeline-desc">Dispatched 30-year parent deeds and FIRC repatriation guideline.</div></div>
         </div>
-        <button class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Full CRM Log</button>
+        <a href="404.html" class="btn btn-outline btn-sm action-404" style="margin-top: 1rem;">View Full CRM Log</a>
       </div>
       <div class="feature-card" style="padding: 1.5rem;">
         <h4 style="font-size: 1.05rem;">Counter-Offer & Escrow Negotiation</h4>
         <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Automated token deposit escrow requests with verified bank accounts.</p>
         <div class="info-callout" style="margin: 0.75rem 0;">Pending Review: Offer for Green Valley Villa at ₹2.15 Cr (Asking: ₹2.20 Cr)</div>
-        <button class="btn btn-dark btn-sm action-404">Launch Negotiation Console</button>
+        <a href="404.html" class="btn btn-dark btn-sm action-404">Launch Negotiation Console</a>
       </div>
     </div>
 
     <!-- S6: WhatsApp & SMS Automation Queue -->
     <div class="dash-panel" style="margin-top: 1.5rem;">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">Automated Client Broadcasts & Notification Queue</h3><button class="btn btn-outline btn-sm action-404">Configure Triggers</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">Automated Client Broadcasts & Notification Queue</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Configure Triggers</a></div>
       <div class="table-responsive">
         <table class="data-table">
           <thead><tr><th>Broadcast Campaign</th><th>Target Audience</th><th>Scheduled Delivery</th><th>Delivery Channel</th><th>Engagement Rate</th><th>Status</th></tr></thead>
@@ -910,10 +1141,10 @@ function renderAnalyticsView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Market Intelligence:</span>
-      <button class="action-chip action-404">Download Salem Market Report</button>
-      <button class="action-chip action-404">Yield Sensitivity Matrix</button>
-      <button class="action-chip action-404">5-Year Appreciation Model</button>
-      <button class="action-chip action-404">Print Locality Index</button>
+      <a href="404.html" class="action-chip action-404">Download Salem Market Report</a>
+      <a href="404.html" class="action-chip action-404">Yield Sensitivity Matrix</a>
+      <a href="404.html" class="action-chip action-404">5-Year Appreciation Model</a>
+      <a href="404.html" class="action-chip action-404">Print Locality Index</a>
     </div>
 
     <!-- S1: Analytics KPIs -->
@@ -926,7 +1157,7 @@ function renderAnalyticsView(container, user, role) {
 
     <!-- S2: Capital Appreciation Neighborhood Forecast -->
     <div class="dash-panel">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">Salem 5-Year Capital Appreciation Projections by Neighborhood</h3><button class="btn btn-outline btn-sm action-404">Export Data</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">Salem 5-Year Capital Appreciation Projections by Neighborhood</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Export Data</a></div>
       <div class="table-responsive">
         <table class="data-table">
           <thead><tr><th>Locality Corridor</th><th>Current Rate (2026)</th><th>3-Yr Projected (2029)</th><th>5-Yr Projected (2031)</th><th>Key Infrastructure Driver</th><th>Growth Confidence</th></tr></thead>
@@ -956,8 +1187,8 @@ function renderAnalyticsView(container, user, role) {
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
             Salem Spread: +360 bps Alpha
           </span>
-          <button class="btn btn-outline btn-sm action-404" style="color:#ffffff; border-color: rgba(255,255,255,0.25);">Export Model (CSV)</button>
-          <button class="btn btn-primary btn-sm action-404">Yield Sensitivity Tool</button>
+          <a href="404.html" class="btn btn-outline btn-sm action-404" style="color:#ffffff; border-color: rgba(255,255,255,0.25);">Export Model (CSV)</a>
+          <a href="404.html" class="btn btn-primary btn-sm action-404">Yield Sensitivity Tool</a>
         </div>
       </div>
 
@@ -1189,14 +1420,14 @@ function renderAnalyticsView(container, user, role) {
         <h4 style="font-size: 1.05rem;">Investment Sensitivity & Return Estimator</h4>
         <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.75rem;">Simulate capital growth, rental returns, and tax deductions under Indian IT Act Sec 54.</p>
         <div class="info-callout" style="margin-bottom: 1rem;">₹1.50 Cr Investment @ 8.4% Appreciation + 7% Yield = <strong>₹3.18 Cr Value in 7 Years</strong></div>
-        <button class="btn btn-primary btn-sm action-404">Customize Parameters</button>
+        <a href="404.html" class="btn btn-primary btn-sm action-404">Customize Parameters</a>
       </div>
       <div class="feature-card" style="padding: 1.5rem;">
         <h4 style="font-size: 1.05rem;">Mortgage EMI vs Rental Realization</h4>
         <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">With average Salem rental yield of 7.2%, rental income covers up to 82% of standard 20-year home loan EMIs.</p>
         <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 82%;"></div></div>
         <p style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">82% EMI Offset by Corporate Rental Escrows</p>
-        <button class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">View Mortgage Benchmarks</button>
+        <a href="404.html" class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">View Mortgage Benchmarks</a>
       </div>
     </div>
 
@@ -1225,10 +1456,10 @@ function renderAdvisoryView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Advisory Desk:</span>
-      <button class="action-chip action-404">Request 30-Year Title Search</button>
-      <button class="action-chip action-404">NRI Consular Legal Hotline</button>
-      <button class="action-chip action-404">Structural Engineer Audit</button>
-      <button class="action-chip action-404">Capital Gains 54EC Consultation</button>
+      <a href="404.html" class="action-chip action-404">Request 30-Year Title Search</a>
+      <a href="404.html" class="action-chip action-404">NRI Consular Legal Hotline</a>
+      <a href="404.html" class="action-chip action-404">Structural Engineer Audit</a>
+      <a href="404.html" class="action-chip action-404">Capital Gains 54EC Consultation</a>
     </div>
 
     <!-- S1: Advisory Desk KPIs -->
@@ -1241,14 +1472,14 @@ function renderAdvisoryView(container, user, role) {
 
     <!-- S2: Senior Legal Counsel Panel -->
     <div class="dash-panel">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">Dedicated Salem Legal Advisory Panel</h3><button class="btn btn-outline btn-sm action-404">Book Consultation</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">Dedicated Salem Legal Advisory Panel</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Book Consultation</a></div>
       <div class="table-responsive">
         <table class="data-table">
           <thead><tr><th>Advocate / Specialist</th><th>Designation</th><th>Bar Council Enrollment</th><th>Specialty Domain</th><th>Availability</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><strong>Adv. K. Sundararajan B.A. B.L.</strong></td><td>Senior Legal Counsel</td><td>MS/1840/1998</td><td>Title Deed Trace & Land Conveyancing</td><td><span class="status-pill status-active">Available Today</span></td><td><button class="btn btn-primary btn-sm action-404">Direct Call</button></td></tr>
-            <tr><td><strong>Adv. Priya Meenakshi LL.M.</strong></td><td>RERA Compliance Lead</td><td>TN/2910/2006</td><td>TN RERA Registrations & Builder Arbitration</td><td><span class="status-pill status-active">Available Today</span></td><td><button class="btn btn-primary btn-sm action-404">Direct Call</button></td></tr>
-            <tr><td><strong>Adv. S. Vigneshwaran B.L.</strong></td><td>NRI Legal Concierge</td><td>TN/1124/2012</td><td>FEMA, PoA Attestation & Foreign Inward Remittance</td><td><span class="status-pill status-pending">In Consultation</span></td><td><button class="btn btn-ghost btn-sm action-404">Leave Message</button></td></tr>
+            <tr><td><strong>Adv. K. Sundararajan B.A. B.L.</strong></td><td>Senior Legal Counsel</td><td>MS/1840/1998</td><td>Title Deed Trace & Land Conveyancing</td><td><span class="status-pill status-active">Available Today</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Direct Call</a></td></tr>
+            <tr><td><strong>Adv. Priya Meenakshi LL.M.</strong></td><td>RERA Compliance Lead</td><td>TN/2910/2006</td><td>TN RERA Registrations & Builder Arbitration</td><td><span class="status-pill status-active">Available Today</span></td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Direct Call</a></td></tr>
+            <tr><td><strong>Adv. S. Vigneshwaran B.L.</strong></td><td>NRI Legal Concierge</td><td>TN/1124/2012</td><td>FEMA, PoA Attestation & Foreign Inward Remittance</td><td><span class="status-pill status-pending">In Consultation</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Leave Message</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -1273,27 +1504,27 @@ function renderAdvisoryView(container, user, role) {
         <h4 style="font-size: 1.05rem;">NRI Repatriation & FEMA Concierge Desk</h4>
         <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.75rem;">End-to-end guidance for Non-Resident Indians to acquire, hold, or sell properties in Salem without traveling.</p>
         <div class="info-callout" style="margin-bottom: 0.75rem;">FIRC Certificate Assistance • NRE/NRO Bank Account Routing • Consular PoA Attestation</div>
-        <button class="btn btn-outline btn-sm action-404">NRI Desk Hotline</button>
+        <a href="404.html" class="btn btn-outline btn-sm action-404">NRI Desk Hotline</a>
       </div>
       <div class="feature-card" style="padding: 1.5rem;">
         <h4 style="font-size: 1.05rem;">Capital Gains Tax Advisory (Section 54/54EC)</h4>
         <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.5rem;">Optimize tax liabilities on real estate transactions through authorized REC/NHAI 54EC capital gains bonds.</p>
         <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width: 100%;"></div></div>
         <p style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">100% Tax Exemption Guidance Verified by Chartered Accountants</p>
-        <button class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">Consult CA Panel</button>
+        <a href="404.html" class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">Consult CA Panel</a>
       </div>
     </div>
 
     <!-- S6: Structural Engineering Inspection -->
     <div class="dash-panel" style="margin-top: 1.5rem;">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">On-Demand Physical Survey & Structural Engineering Audits</h3><button class="btn btn-outline btn-sm action-404">Book Surveyor</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">On-Demand Physical Survey & Structural Engineering Audits</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Book Surveyor</a></div>
       <div class="table-responsive">
         <table class="data-table">
           <thead><tr><th>Audit Package</th><th>Scope of Work</th><th>Turnaround Time</th><th>Deliverables</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><strong>Total Station Boundary DGPS Survey</strong></td><td>Precise satellite coordinate boundary marking</td><td>24 Hours</td><td>Signed Surveyor Map + CAD File</td><td><button class="btn btn-primary btn-sm action-404">Request Audit</button></td></tr>
-            <tr><td><strong>Structural Stability & Concrete Core Test</strong></td><td>Rebound hammer test, foundation inspection</td><td>48 Hours</td><td>Government Certified Engineer Report</td><td><button class="btn btn-primary btn-sm action-404">Request Audit</button></td></tr>
-            <tr><td><strong>Borewell Water & Soil Bearing Capacity</strong></td><td>Purity test (TDS, Hardness) + SBC test</td><td>72 Hours</td><td>NABL Accredited Lab Dossier</td><td><button class="btn btn-primary btn-sm action-404">Request Audit</button></td></tr>
+            <tr><td><strong>Total Station Boundary DGPS Survey</strong></td><td>Precise satellite coordinate boundary marking</td><td>24 Hours</td><td>Signed Surveyor Map + CAD File</td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Request Audit</a></td></tr>
+            <tr><td><strong>Structural Stability & Concrete Core Test</strong></td><td>Rebound hammer test, foundation inspection</td><td>48 Hours</td><td>Government Certified Engineer Report</td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Request Audit</a></td></tr>
+            <tr><td><strong>Borewell Water & Soil Bearing Capacity</strong></td><td>Purity test (TDS, Hardness) + SBC test</td><td>72 Hours</td><td>NABL Accredited Lab Dossier</td><td><a href="404.html" class="btn btn-primary btn-sm action-404">Request Audit</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -1309,11 +1540,11 @@ function renderSettingsView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Account Controls:</span>
-      <button class="action-chip action-404">Update Profile Details</button>
-      <button class="action-chip action-404">Change Password</button>
-      <button class="action-chip action-404">Upload Identity Proof</button>
-      <button class="action-chip action-404">Manage 2FA Devices</button>
-      <button class="action-chip action-404">Delete Account</button>
+      <a href="404.html" class="action-chip action-404">Update Profile Details</a>
+      <a href="404.html" class="action-chip action-404">Change Password</a>
+      <a href="404.html" class="action-chip action-404">Upload Identity Proof</a>
+      <a href="404.html" class="action-chip action-404">Manage 2FA Devices</a>
+      <a href="404.html" class="action-chip action-404">Delete Account</a>
     </div>
 
     <!-- S1: Security Health KPIs -->
@@ -1326,7 +1557,7 @@ function renderSettingsView(container, user, role) {
 
     <!-- S2: Profile Identity Editor -->
     <div class="dash-panel">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">Personal Profile & Professional Credentials</h3><button class="btn btn-primary btn-sm action-404">Save Changes</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">Personal Profile & Professional Credentials</h3><a href="404.html" class="btn btn-primary btn-sm action-404">Save Changes</a></div>
       <div class="grid-2" style="margin-top: 1rem;">
         <div class="form-group">
           <label class="form-label">Full Legal Name</label>
@@ -1349,15 +1580,15 @@ function renderSettingsView(container, user, role) {
 
     <!-- S3: KYC Document Vault -->
     <div class="dash-panel">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">KYC & Legal Identity Document Vault</h3><button class="btn btn-outline btn-sm action-404">+ Upload Document</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">KYC & Legal Identity Document Vault</h3><a href="404.html" class="btn btn-outline btn-sm action-404">+ Upload Document</a></div>
       <div class="table-responsive">
         <table class="data-table">
           <thead><tr><th>Document Category</th><th>File Name</th><th>Upload Date</th><th>Encryption Standard</th><th>Verification Status</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><strong>Permanent Account Number (PAN)</strong></td><td>PAN_CARD_VERIFIED.pdf</td><td>10 Jan 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Verified (ITD Sync)</span></td><td><button class="btn btn-ghost btn-sm action-404">View File</button></td></tr>
-            <tr><td><strong>Aadhaar / National ID</strong></td><td>AADHAAR_MASKED.pdf</td><td>10 Jan 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Verified (UIDAI)</span></td><td><button class="btn btn-ghost btn-sm action-404">View File</button></td></tr>
-            <tr><td><strong>Bank Account Mandate</strong></td><td>CANCELLED_CHEQUE.pdf</td><td>15 Jan 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Verified (Penny Drop)</span></td><td><button class="btn btn-ghost btn-sm action-404">View File</button></td></tr>
-            <tr><td><strong>RERA / Property Registration</strong></td><td>DEED_PATTA_REGISTRY.pdf</td><td>02 Feb 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Sub-Registrar Cleared</span></td><td><button class="btn btn-ghost btn-sm action-404">View File</button></td></tr>
+            <tr><td><strong>Permanent Account Number (PAN)</strong></td><td>PAN_CARD_VERIFIED.pdf</td><td>10 Jan 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Verified (ITD Sync)</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View File</a></td></tr>
+            <tr><td><strong>Aadhaar / National ID</strong></td><td>AADHAAR_MASKED.pdf</td><td>10 Jan 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Verified (UIDAI)</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View File</a></td></tr>
+            <tr><td><strong>Bank Account Mandate</strong></td><td>CANCELLED_CHEQUE.pdf</td><td>15 Jan 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Verified (Penny Drop)</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View File</a></td></tr>
+            <tr><td><strong>RERA / Property Registration</strong></td><td>DEED_PATTA_REGISTRY.pdf</td><td>02 Feb 2026</td><td>AES-256 Bit</td><td><span class="status-pill status-active">Sub-Registrar Cleared</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">View File</a></td></tr>
           </tbody>
         </table>
       </div>
@@ -1369,7 +1600,7 @@ function renderSettingsView(container, user, role) {
         <h4 style="font-size: 1.05rem;">Security & Two-Factor Authentication</h4>
         <p style="font-size: 0.875rem; color: var(--color-text-muted); margin-bottom: 0.75rem;">Protect your property portfolio and financial escrow holds with biometric and SMS OTP authentication.</p>
         <div class="info-callout" style="margin-bottom: 1rem;">Primary 2FA Method: SMS to +91 98***3210 (Backup TOTP Configured)</div>
-        <button class="btn btn-outline btn-sm action-404">Configure Security</button>
+        <a href="404.html" class="btn btn-outline btn-sm action-404">Configure Security</a>
       </div>
       <div class="feature-card" style="padding: 1.5rem;">
         <h4 style="font-size: 1.05rem;">Emergency Nominee & Successor Delegation</h4>
@@ -1377,72 +1608,22 @@ function renderSettingsView(container, user, role) {
         <div class="step-timeline">
           <div class="step-timeline-item done"><div class="step-timeline-title">Nominee Appointed</div><div class="step-timeline-desc">Spouse / Legal Heir verified with Aadhaar.</div></div>
         </div>
-        <button class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">Update Nominee</button>
+        <a href="404.html" class="btn btn-dark btn-sm action-404" style="margin-top: 1rem;">Update Nominee</a>
       </div>
     </div>
 
     <!-- S6: Active Device & Session Telemetry -->
     <div class="dash-panel" style="margin-top: 1.5rem;">
-      <div class="dash-panel-header"><h3 class="dash-panel-title">Active Device Logins & Session Security</h3><button class="btn btn-outline btn-sm action-404">Log Out All Other Devices</button></div>
+      <div class="dash-panel-header"><h3 class="dash-panel-title">Active Device Logins & Session Security</h3><a href="404.html" class="btn btn-outline btn-sm action-404">Log Out All Other Devices</a></div>
       <div class="table-responsive">
         <table class="data-table">
           <thead><tr><th>Device & Browser</th><th>Location (IP Geo)</th><th>IP Address</th><th>Last Active</th><th>Session State</th><th>Action</th></tr></thead>
           <tbody>
-            <tr><td><strong>Windows PC • Chrome 132</strong></td><td>Salem, Tamil Nadu, India</td><td>157.49.201.84</td><td>Active Now</td><td><span class="status-pill status-active">Current Session</span></td><td><button class="btn btn-ghost btn-sm action-404" disabled>Current</button></td></tr>
-            <tr><td><strong>Apple iPhone 15 Pro • Safari</strong></td><td>Salem, Tamil Nadu, India</td><td>157.49.198.12</td><td>3 Hours Ago</td><td><span class="status-pill status-pending">Idle</span></td><td><button class="btn btn-ghost btn-sm action-404">Revoke</button></td></tr>
+            <tr><td><strong>Windows PC • Chrome 132</strong></td><td>Salem, Tamil Nadu, India</td><td>157.49.201.84</td><td>Active Now</td><td><span class="status-pill status-active">Current Session</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404" disabled>Current</a></td></tr>
+            <tr><td><strong>Apple iPhone 15 Pro • Safari</strong></td><td>Salem, Tamil Nadu, India</td><td>157.49.198.12</td><td>3 Hours Ago</td><td><span class="status-pill status-pending">Idle</span></td><td><a href="404.html" class="btn btn-ghost btn-sm action-404">Revoke</a></td></tr>
           </tbody>
         </table>
       </div>
     </div>
   `;
-}
-
-/* ==========================================================================
-   5. ROLE QUICK SWITCHER
-   ========================================================================== */
-function initRoleQuickSwitcher(currentUser) {
-  const headerSelect = document.getElementById("header-role-select");
-  if (headerSelect) {
-    headerSelect.value = currentUser.role || "Buyer";
-    headerSelect.addEventListener("change", (e) => {
-      handleRoleChange(e.target.value);
-    });
-  }
-
-  let switcher = document.getElementById("role-quick-switcher");
-  if (!switcher) {
-    switcher = document.createElement("div");
-    switcher.id = "role-quick-switcher";
-    switcher.className = "role-quick-switcher";
-    switcher.innerHTML = `
-      <span>View as Role:</span>
-      <select id="quick-role-select">
-        <option value="Buyer" ${currentUser.role === "Buyer" ? "selected" : ""}>Buyer</option>
-        <option value="Seller" ${currentUser.role === "Seller" ? "selected" : ""}>Seller</option>
-        <option value="Agent" ${currentUser.role === "Agent" ? "selected" : ""}>Agent</option>
-        <option value="Manager" ${currentUser.role === "Manager" ? "selected" : ""}>Manager</option>
-        <option value="Admin" ${currentUser.role === "Admin" ? "selected" : ""}>Admin</option>
-      </select>
-    `;
-    document.body.appendChild(switcher);
-  }
-
-  const quickSelect = document.getElementById("quick-role-select");
-  if (quickSelect) {
-    quickSelect.value = currentUser.role || "Buyer";
-    quickSelect.addEventListener("change", (e) => {
-      handleRoleChange(e.target.value);
-    });
-  }
-
-  function handleRoleChange(newRole) {
-    currentUser.role = newRole;
-    currentRole = newRole;
-    window.StacklyStore.setCurrentUser(currentUser);
-    initHeaderUI(currentUser);
-    if (headerSelect) headerSelect.value = newRole;
-    if (quickSelect) quickSelect.value = newRole;
-    renderSubpage(activeSubpage, currentUser);
-    window.showToast(`Switched perspective to: ${newRole}`, "info");
-  }
 }

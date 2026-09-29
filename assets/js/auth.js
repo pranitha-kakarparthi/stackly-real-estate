@@ -13,6 +13,90 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 /* ==========================================================================
+   STRICT VALIDATION HELPERS
+   ========================================================================== */
+
+/**
+ * Validates email against strict RFC format, length, and character constraints:
+ * - Length: 6 to 254 characters
+ * - No consecutive dots ('..')
+ * - Local part: 1 to 64 chars, alphanumeric, allows . _ % + -
+ * - Domain part: alphanumeric, hyphens, valid TLD of at least 2 alpha chars
+ */
+function validateStrictEmail(email) {
+  if (!email || typeof email !== "string") {
+    return { valid: false, message: "Email address is required" };
+  }
+  const val = email.trim();
+  if (!val) {
+    return { valid: false, message: "Email address is required" };
+  }
+  if (val.length < 6 || val.length > 254) {
+    return {
+      valid: false,
+      message: "Email must be between 6 and 254 characters",
+    };
+  }
+  if (val.includes("..")) {
+    return { valid: false, message: "Email cannot contain consecutive dots" };
+  }
+  const emailRegex =
+    /^[a-zA-Z0-9](?:[a-zA-Z0-9._%+-]*[a-zA-Z0-9])?@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$/;
+  if (!emailRegex.test(val)) {
+    return {
+      valid: false,
+      message: "Please enter a valid email format (e.g. name@domain.com)",
+    };
+  }
+  const parts = val.split("@");
+  if (parts[0].length > 64) {
+    return {
+      valid: false,
+      message: "Email username portion cannot exceed 64 characters",
+    };
+  }
+  return { valid: true };
+}
+
+/**
+ * Validates password strictly against complexity rules:
+ * - Minimum 8 characters length
+ * - At least 1 capital alphabet (A-Z)
+ * - At least 1 numeric character (0-9)
+ * - At least 1 special character (!@#$%^&* etc.)
+ */
+function validateStrictPassword(password) {
+  if (!password) {
+    return { valid: false, message: "Password is required" };
+  }
+  if (password.length < 8) {
+    return {
+      valid: false,
+      message: "Password must be at least 8 characters long",
+    };
+  }
+  if (!/[A-Z]/.test(password)) {
+    return {
+      valid: false,
+      message: "Password must contain at least one capital alphabet (A-Z)",
+    };
+  }
+  if (!/[0-9]/.test(password)) {
+    return {
+      valid: false,
+      message: "Password must contain at least one numeric character (0-9)",
+    };
+  }
+  if (!/[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password)) {
+    return {
+      valid: false,
+      message: "Password must contain at least one special character",
+    };
+  }
+  return { valid: true };
+}
+
+/* ==========================================================================
    1. PASSWORD SHOW / HIDE TOGGLE
    ========================================================================== */
 function initPasswordToggles() {
@@ -116,6 +200,41 @@ function initSignUpForm() {
   const form = document.getElementById("signup-form");
   if (!form) return;
 
+  const terms = document.getElementById("signup-terms");
+
+  const setError = (field, msg) => {
+    const group = field.closest(".form-group");
+    if (group) {
+      group.classList.add("has-error");
+      let errorEl = group.querySelector(".field-error-msg");
+      if (!errorEl) {
+        errorEl = document.createElement("span");
+        errorEl.className = "field-error-msg";
+        group.appendChild(errorEl);
+      }
+      errorEl.textContent = msg;
+    }
+    field.classList.add("is-invalid");
+  };
+
+  const clearError = (field) => {
+    const group = field.closest(".form-group");
+    if (group) {
+      group.classList.remove("has-error");
+      const errorEl = group.querySelector(".field-error-msg");
+      if (errorEl) errorEl.textContent = "";
+    }
+    field.classList.remove("is-invalid");
+  };
+
+  // Live error clearing
+  form
+    .querySelectorAll(".form-input, .form-select, input[type='checkbox']")
+    .forEach((inp) => {
+      inp.addEventListener("input", () => clearError(inp));
+      inp.addEventListener("change", () => clearError(inp));
+    });
+
   form.addEventListener("submit", (e) => {
     e.preventDefault();
 
@@ -129,72 +248,96 @@ function initSignUpForm() {
     const countryCode = document.getElementById("signup-country-code");
     const phone = document.getElementById("signup-phone");
     const address = document.getElementById("signup-address");
-    const terms = document.getElementById("signup-terms");
 
     let firstInvalidField = null;
 
-    const setError = (field, msg) => {
-      const group = field.closest(".form-group");
-      if (group) {
-        group.classList.add("has-error");
-        let errorEl = group.querySelector(".field-error-msg");
-        if (!errorEl) {
-          errorEl = document.createElement("span");
-          errorEl.className = "field-error-msg";
-          group.appendChild(errorEl);
-        }
-        errorEl.textContent = msg;
-      }
-      field.classList.add("is-invalid");
-      if (!firstInvalidField) firstInvalidField = field;
-    };
+    form
+      .querySelectorAll(".form-input, .form-select, input[type='checkbox']")
+      .forEach(clearError);
 
-    const clearError = (field) => {
-      const group = field.closest(".form-group");
-      if (group) group.classList.remove("has-error");
-      field.classList.remove("is-invalid");
-    };
-
-    form.querySelectorAll(".form-input, .form-select").forEach(clearError);
-
-    // Validations
+    // 1. Name fields: alphabetical characters only
+    const alphaRegex = /^[A-Za-z\s]+$/;
     if (!firstName.value.trim()) {
       setError(firstName, "First name is required");
+      if (!firstInvalidField) firstInvalidField = firstName;
+    } else if (!alphaRegex.test(firstName.value.trim())) {
+      setError(
+        firstName,
+        "Name field should allow only alphabetical characters"
+      );
+      if (!firstInvalidField) firstInvalidField = firstName;
     }
+
     if (!lastName.value.trim()) {
       setError(lastName, "Last name is required");
+      if (!firstInvalidField) firstInvalidField = lastName;
+    } else if (!alphaRegex.test(lastName.value.trim())) {
+      setError(
+        lastName,
+        "Name field should allow only alphabetical characters"
+      );
+      if (!firstInvalidField) firstInvalidField = lastName;
     }
+
+    // 2. Username
+    const usernameRegex = /^[A-Za-z0-9_.-]+$/;
     if (!username.value.trim() || username.value.trim().length < 3) {
       setError(username, "Username must be at least 3 characters");
+      if (!firstInvalidField) firstInvalidField = username;
+    } else if (!usernameRegex.test(username.value.trim())) {
+      setError(username, "Username can only contain letters, numbers, and .-_");
+      if (!firstInvalidField) firstInvalidField = username;
     }
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.value.trim() || !emailRegex.test(email.value.trim())) {
-      setError(email, "Please provide a valid email format");
+    // 3. Email: Strict format, length, and allowed characters
+    const emailCheck = validateStrictEmail(email.value);
+    if (!emailCheck.valid) {
+      setError(email, emailCheck.message);
+      if (!firstInvalidField) firstInvalidField = email;
     }
 
-    const { score } = evaluatePasswordStrength(password.value);
-    if (!password.value || score < 3) {
-      setError(
-        password,
-        "Password must have min 8 chars with mixed case, numbers & special character"
-      );
+    // 4. Password: Min 8 chars, 1 special char, 1 numeric char, 1 capital alphabet at least
+    const passwordCheck = validateStrictPassword(password.value);
+    if (!passwordCheck.valid) {
+      setError(password, passwordCheck.message);
+      if (!firstInvalidField) firstInvalidField = password;
     }
 
-    if (!confirmPassword.value || confirmPassword.value !== password.value) {
-      setError(confirmPassword, "Passwords do not match");
+    // 5. Password and confirm password should be same
+    if (!confirmPassword.value) {
+      setError(confirmPassword, "Please confirm your password");
+      if (!firstInvalidField) firstInvalidField = confirmPassword;
+    } else if (confirmPassword.value !== password.value) {
+      setError(confirmPassword, "Password and confirm password should be same");
+      if (!firstInvalidField) firstInvalidField = confirmPassword;
     }
 
+    // 6. Role selection
     if (!role.value) {
       setError(role, "Please select your role");
+      if (!firstInvalidField) firstInvalidField = role;
     }
 
-    const phoneVal = phone.value.replace(/[^0-9]/g, "");
-    if (!phoneVal || phoneVal.length < 8) {
-      setError(phone, "Please enter a valid numeric phone number");
+    // 7. Mobile Number: numeric characters only
+    const phoneRaw = phone.value.trim();
+    const numericRegex = /^[0-9]+$/;
+    if (!phoneRaw) {
+      setError(phone, "Mobile number is required");
+      if (!firstInvalidField) firstInvalidField = phone;
+    } else if (!numericRegex.test(phoneRaw)) {
+      setError(
+        phone,
+        "Mobile number field should allow only numeric characters"
+      );
+      if (!firstInvalidField) firstInvalidField = phone;
+    } else if (phoneRaw.length < 7 || phoneRaw.length > 15) {
+      setError(phone, "Mobile number must be between 7 and 15 digits");
+      if (!firstInvalidField) firstInvalidField = phone;
     }
 
+    // 8. Agree T&C checkbox is a mandatory field
     if (!terms.checked) {
+      setError(terms, "You must agree to the Terms of Use and Privacy Policy");
       window.showToast(
         "You must agree to the Terms of Use and Privacy Policy.",
         "error"
@@ -217,7 +360,7 @@ function initSignUpForm() {
       password: password.value,
       role: role.value,
       countryCode: countryCode ? countryCode.value : "+91",
-      phone: phoneVal,
+      phone: phoneRaw,
       address: address ? address.value.trim() : "",
       createdAt: new Date().toISOString(),
     };
@@ -239,8 +382,8 @@ function initSignUpForm() {
 
 /* ==========================================================================
    4. SIGN IN FORM CONTROLLER
-   Condition: "Remove all the demo credentials and make sure sign-in should
-   work with any proper valid email id and password."
+   - Strict Email validation
+   - Strict Password validation (min 8 chars, 1 special char, 1 numeric, 1 capital)
    ========================================================================== */
 function initSignInForm() {
   const form = document.getElementById("signin-form");
@@ -273,29 +416,33 @@ function initSignInForm() {
 
     const clearError = (field) => {
       const group = field.closest(".form-group");
-      if (group) group.classList.remove("has-error");
+      if (group) {
+        group.classList.remove("has-error");
+        const errorEl = group.querySelector(".field-error-msg");
+        if (errorEl) errorEl.textContent = "";
+      }
       field.classList.remove("is-invalid");
     };
 
+    // Live error clearing
+    form.querySelectorAll(".form-input, .form-select").forEach((inp) => {
+      inp.addEventListener("input", () => clearError(inp));
+      inp.addEventListener("change", () => clearError(inp));
+    });
+
     form.querySelectorAll(".form-input, .form-select").forEach(clearError);
 
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Validate email format strictly
     const emailVal = email.value.trim();
-    if (!emailVal) {
-      setError(email, "Email address is required");
-    } else if (!emailRegex.test(emailVal)) {
-      setError(
-        email,
-        "Please enter a valid email format (e.g. name@domain.com)"
-      );
+    const emailCheck = validateStrictEmail(emailVal);
+    if (!emailCheck.valid) {
+      setError(email, emailCheck.message);
     }
 
-    // Validate password (non-empty, min 4-6 chars)
-    if (!password.value) {
-      setError(password, "Password is required");
-    } else if (password.value.length < 4) {
-      setError(password, "Password must be at least 4 characters");
+    // Validate password strictly (min 8 chars, 1 special char, 1 numeric, 1 capital alphabet)
+    const passwordCheck = validateStrictPassword(password.value);
+    if (!passwordCheck.valid) {
+      setError(password, passwordCheck.message);
     }
 
     if (firstInvalidField) {
@@ -334,7 +481,8 @@ function initSignInForm() {
     );
 
     setTimeout(() => {
-      window.location.href = "dashboard.html";
+      const targetRole = (selectedRole || "Buyer").toLowerCase();
+      window.location.href = `dashboard-${targetRole}.html`;
     }, 600);
   });
 }

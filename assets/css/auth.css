@@ -65,7 +65,7 @@
     linear-gradient(135deg, rgba(20, 24, 36, 0.96), rgba(27, 32, 50, 0.92)),
     url("../images/properties/property-1.webp") center/cover no-repeat;
   color: #ffffff;
-  padding: 8rem 4rem 4rem 4rem;
+  padding: 6rem 4rem 4rem 4rem;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -191,10 +191,10 @@
 
 /* Form Container Column (Right) */
 .auth-form-side {
-  padding: 7.5rem 4rem 4rem 4rem;
+  padding: 6rem 4rem 4rem 4rem;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   overflow-y: auto;
 }
 

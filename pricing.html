@@ -55,30 +55,7 @@
               <a href="index.html" class="nav-link">Home</a>
             </div>
             <div class="nav-item">
-              <a href="properties.html" class="nav-link">
-                <span>Properties</span>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </a>
-              <div class="nav-dropdown">
-                <a href="properties.html?status=sale" class="dropdown-link"
-                  >Properties For Sale</a
-                >
-                <a href="properties.html?status=rent" class="dropdown-link"
-                  >Luxury Rentals</a
-                >
-                <a href="properties.html?type=Villa" class="dropdown-link"
-                  >Gated Villas</a
-                >
-              </div>
+              <a href="properties.html" class="nav-link">Properties</a>
             </div>
             <div class="nav-item">
               <a href="about.html" class="nav-link">About Us</a>
@@ -118,16 +95,13 @@
       </div>
       <div class="mobile-menu-list">
         <a href="index.html" class="mobile-nav-link">Home</a>
-        <a href="properties.html" class="mobile-nav-link"
-          >Properties Catalogue</a
-        >
+        <a href="properties.html" class="mobile-nav-link">Properties</a>
         <a href="about.html" class="mobile-nav-link">About Stackly</a>
         <a href="services.html" class="mobile-nav-link">Advisory & Services</a>
         <a href="pricing.html" class="mobile-nav-link active"
           >Pricing Packages</a
         >
         <a href="contact.html" class="mobile-nav-link">Contact Office</a>
-        <a href="dashboard.html" class="mobile-nav-link">Dashboard Portal</a>
       </div>
       <div class="mobile-drawer-footer">
         <a
@@ -175,49 +149,66 @@
               align-items: center;
               gap: 1rem;
               background: var(--color-bg-light);
-              padding: 0.5rem 1rem;
+              padding: 0.5rem 1.25rem;
               border-radius: var(--radius-full);
               margin-top: 1.5rem;
               border: 1px solid var(--color-border);
+              box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
             "
           >
             <span
+              id="billing-monthly-label"
               style="
                 font-size: 0.9375rem;
-                font-weight: 600;
-                color: var(--color-dark);
+                font-weight: 500;
+                color: var(--color-text-muted);
+                cursor: pointer;
+                user-select: none;
+                transition: all var(--transition-fast);
               "
               >Monthly Billing</span
             >
             <div
               style="
                 position: relative;
-                width: 48px;
-                height: 26px;
+                width: 52px;
+                height: 28px;
                 background: var(--color-primary);
                 border-radius: var(--radius-full);
                 cursor: pointer;
+                user-select: none;
+                transition: background 0.25s ease;
               "
               id="billing-toggle"
+              role="switch"
+              aria-checked="true"
+              tabindex="0"
+              aria-label="Toggle between monthly and annual billing"
             >
               <div
+                id="billing-toggle-knob"
                 style="
                   position: absolute;
                   top: 3px;
-                  left: 25px;
-                  width: 20px;
-                  height: 20px;
+                  left: 27px;
+                  width: 22px;
+                  height: 22px;
                   background: #fff;
                   border-radius: 50%;
-                  transition: left 0.2s ease;
+                  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+                  transition: left 0.25s cubic-bezier(0.16, 1, 0.3, 1);
                 "
               ></div>
             </div>
             <span
+              id="billing-annual-label"
               style="
                 font-size: 0.9375rem;
-                font-weight: 600;
+                font-weight: 700;
                 color: var(--color-dark);
+                cursor: pointer;
+                user-select: none;
+                transition: all var(--transition-fast);
               "
               >Annual Billing
               <span
@@ -227,6 +218,8 @@
                   padding: 2px 8px;
                   border-radius: 4px;
                   font-size: 0.75rem;
+                  font-weight: 700;
+                  margin-left: 0.25rem;
                 "
                 >Save 20%</span
               ></span
@@ -372,14 +365,15 @@
                   Professional Broker
                 </h3>
                 <div
+                  id="price-pro"
                   style="
                     font-size: 2.5rem;
                     font-weight: 800;
                     color: var(--color-dark);
-                    margin-bottom: 1.5rem;
+                    margin-bottom: 0.5rem;
                   "
                 >
-                  ₹1,999
+                  ₹1,599
                   <span
                     style="
                       font-size: 1rem;
@@ -388,6 +382,17 @@
                     "
                     >/ month</span
                   >
+                </div>
+                <div
+                  id="note-pro"
+                  style="
+                    font-size: 0.8125rem;
+                    color: #557800;
+                    font-weight: 600;
+                    margin-bottom: 1.5rem;
+                  "
+                >
+                  ₹19,188 billed annually (Save 20%)
                 </div>
                 <p
                   style="
@@ -453,14 +458,15 @@
                   Agency Enterprise
                 </h3>
                 <div
+                  id="price-enterprise"
                   style="
                     font-size: 2.5rem;
                     font-weight: 800;
                     color: var(--color-dark);
-                    margin-bottom: 1.5rem;
+                    margin-bottom: 0.5rem;
                   "
                 >
-                  ₹7,999
+                  ₹6,399
                   <span
                     style="
                       font-size: 1rem;
@@ -469,6 +475,17 @@
                     "
                     >/ month</span
                   >
+                </div>
+                <div
+                  id="note-enterprise"
+                  style="
+                    font-size: 0.8125rem;
+                    color: #557800;
+                    font-weight: 600;
+                    margin-bottom: 1.5rem;
+                  "
+                >
+                  ₹76,788 billed annually (Save 20%)
                 </div>
                 <p
                   style="
@@ -519,74 +536,274 @@
             </p>
           </div>
 
-          <div
-            class="dash-panel"
-            style="
-              background: var(--color-surface);
-              padding: 0;
-              overflow: hidden;
-            "
-          >
+          <div class="pricing-comparison-card">
             <div class="table-responsive">
-              <table class="data-table">
+              <table class="comparison-table">
                 <thead>
                   <tr>
-                    <th style="width: 40%">Platform Capabilities</th>
-                    <th style="text-align: center">Starter</th>
-                    <th
-                      style="
-                        text-align: center;
-                        background: rgba(146, 200, 0, 0.15);
-                        color: var(--color-dark);
-                      "
-                    >
-                      Professional
+                    <th class="col-head-feature">Platform Capabilities</th>
+                    <th style="text-align: center; width: 20%">
+                      <div>Starter Seller</div>
+                      <span class="matrix-plan-tag matrix-tag-starter"
+                        >Free Tier</span
+                      >
                     </th>
-                    <th style="text-align: center">Agency Enterprise</th>
+                    <th class="col-pro" style="text-align: center; width: 22%">
+                      <div>Professional Broker</div>
+                      <span class="matrix-plan-tag matrix-tag-pro"
+                        >★ Most Popular</span
+                      >
+                    </th>
+                    <th style="text-align: center; width: 20%">
+                      <div>Agency Enterprise</div>
+                      <span class="matrix-plan-tag matrix-tag-enterprise"
+                        >Full Suite</span
+                      >
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
+                  <!-- Category 1: Listings & Exposure -->
+                  <tr class="category-row">
+                    <td colspan="4">Listings &amp; Market Exposure</td>
+                  </tr>
                   <tr>
-                    <td>Active Property Listings</td>
+                    <td><strong>Active Property Listings</strong></td>
                     <td style="text-align: center">1 Property</td>
-                    <td style="text-align: center; font-weight: 700">
+                    <td
+                      class="col-pro"
+                      style="
+                        text-align: center;
+                        font-weight: 700;
+                        color: var(--color-dark);
+                      "
+                    >
                       15 Properties
                     </td>
-                    <td style="text-align: center; font-weight: 700">
+                    <td
+                      style="
+                        text-align: center;
+                        font-weight: 700;
+                        color: var(--color-dark);
+                      "
+                    >
                       Unlimited
                     </td>
                   </tr>
                   <tr>
-                    <td>Homepage Featured Placement</td>
-                    <td style="text-align: center; color: #94a3b8">✕</td>
-                    <td style="text-align: center">3 / month</td>
-                    <td style="text-align: center">10 / month</td>
+                    <td><strong>Listing Duration</strong></td>
+                    <td style="text-align: center">60 Days</td>
+                    <td
+                      class="col-pro"
+                      style="text-align: center; font-weight: 600"
+                    >
+                      Active Till Sold
+                    </td>
+                    <td style="text-align: center; font-weight: 600">
+                      Active Till Sold
+                    </td>
                   </tr>
                   <tr>
-                    <td>RERA Title Audit Assistance</td>
-                    <td style="text-align: center">Basic Check</td>
-                    <td style="text-align: center">Standard Clearance</td>
-                    <td style="text-align: center; font-weight: 700">
+                    <td><strong>Homepage Featured Badges</strong></td>
+                    <td style="text-align: center">
+                      <span class="matrix-cross">✕</span>
+                    </td>
+                    <td
+                      class="col-pro"
+                      style="text-align: center; font-weight: 600"
+                    >
+                      3 Badges / Month
+                    </td>
+                    <td style="text-align: center; font-weight: 600">
+                      10 Badges / Month
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>4K Drone Video &amp; VR Tour Integration</strong>
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-cross">✕</span>
+                    </td>
+                    <td class="col-pro" style="text-align: center">
+                      <span class="matrix-check">✓</span>
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-check">✓</span> (Priority Encoding)
+                    </td>
+                  </tr>
+
+                  <!-- Category 2: Legal & Verification -->
+                  <tr class="category-row">
+                    <td colspan="4">Title Verification &amp; Legal Escrow</td>
+                  </tr>
+                  <tr>
+                    <td><strong>RERA &amp; DTCP Title Audit</strong></td>
+                    <td style="text-align: center">Basic Title Check</td>
+                    <td
+                      class="col-pro"
+                      style="text-align: center; font-weight: 600"
+                    >
+                      Standard Verification
+                    </td>
+                    <td
+                      style="
+                        text-align: center;
+                        font-weight: 700;
+                        color: var(--color-dark);
+                      "
+                    >
                       Full 30-Yr Legal Escrow
                     </td>
                   </tr>
                   <tr>
-                    <td>Direct Buyer Lead Routing</td>
-                    <td style="text-align: center">✓</td>
-                    <td style="text-align: center">✓ Priority</td>
-                    <td style="text-align: center">✓ Instant SMS & CRM</td>
+                    <td>
+                      <strong>Certified Encumbrance Certificate (EC)</strong>
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-cross">✕</span>
+                    </td>
+                    <td class="col-pro" style="text-align: center">
+                      <span class="matrix-check">✓</span>
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-check">✓</span> Express Clearance
+                    </td>
                   </tr>
                   <tr>
-                    <td>Mortgage Pre-Approval Support</td>
-                    <td style="text-align: center; color: #94a3b8">✕</td>
-                    <td style="text-align: center">✓</td>
-                    <td style="text-align: center">✓ Dedicated Bank Desk</td>
+                    <td><strong>Bank Escrow Account Support</strong></td>
+                    <td style="text-align: center">
+                      <span class="matrix-cross">✕</span>
+                    </td>
+                    <td class="col-pro" style="text-align: center">
+                      <span class="matrix-check">✓</span>
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-check">✓</span> Dedicated Manager
+                    </td>
+                  </tr>
+
+                  <!-- Category 3: Leads & Conversions -->
+                  <tr class="category-row">
+                    <td colspan="4">Lead Routing &amp; Client CRM</td>
                   </tr>
                   <tr>
-                    <td>Team Sub-Accounts</td>
-                    <td style="text-align: center; color: #94a3b8">✕</td>
+                    <td><strong>Direct Buyer Lead Routing</strong></td>
+                    <td style="text-align: center">WhatsApp Leads</td>
+                    <td
+                      class="col-pro"
+                      style="text-align: center; font-weight: 600"
+                    >
+                      Instant WhatsApp &amp; In-App
+                    </td>
+                    <td
+                      style="
+                        text-align: center;
+                        font-weight: 700;
+                        color: var(--color-dark);
+                      "
+                    >
+                      Instant SMS, WhatsApp &amp; CRM
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <strong>In-App Analytics &amp; Yield Telemetry</strong>
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-cross">✕</span>
+                    </td>
+                    <td class="col-pro" style="text-align: center">
+                      <span class="matrix-check">✓</span> Standard View
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-check">✓</span> Advanced Yield Suite
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Mortgage Pre-Approval Desk Access</strong></td>
+                    <td style="text-align: center">
+                      <span class="matrix-cross">✕</span>
+                    </td>
+                    <td class="col-pro" style="text-align: center">
+                      <span class="matrix-check">✓</span>
+                    </td>
+                    <td style="text-align: center">
+                      <span class="matrix-check">✓</span> Direct Banker Roster
+                    </td>
+                  </tr>
+
+                  <!-- Category 4: Team & Support -->
+                  <tr class="category-row">
+                    <td colspan="4">Collaboration &amp; Dedicated Support</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Team Agent Sub-Accounts</strong></td>
                     <td style="text-align: center">1 User</td>
-                    <td style="text-align: center">Up to 10 Agents</td>
+                    <td
+                      class="col-pro"
+                      style="text-align: center; font-weight: 600"
+                    >
+                      1 User (Pro Profile)
+                    </td>
+                    <td
+                      style="
+                        text-align: center;
+                        font-weight: 700;
+                        color: var(--color-dark);
+                      "
+                    >
+                      Up to 10 Agent Accounts
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><strong>Customer Support SLA</strong></td>
+                    <td style="text-align: center">Standard Email (48h)</td>
+                    <td
+                      class="col-pro"
+                      style="text-align: center; font-weight: 600"
+                    >
+                      Priority Email &amp; Phone (4h)
+                    </td>
+                    <td
+                      style="
+                        text-align: center;
+                        font-weight: 700;
+                        color: var(--color-dark);
+                      "
+                    >
+                      Dedicated 24/7 Account Rep
+                    </td>
+                  </tr>
+
+                  <!-- Action / CTA Row -->
+                  <tr class="table-cta-row">
+                    <td>
+                      <span style="font-weight: 600; color: var(--color-dark)"
+                        >Ready to scale your portfolio?</span
+                      >
+                    </td>
+                    <td style="text-align: center">
+                      <a
+                        href="404.html"
+                        class="btn btn-outline btn-sm btn-block action-404"
+                        >Get Starter</a
+                      >
+                    </td>
+                    <td class="col-pro" style="text-align: center">
+                      <a
+                        href="404.html"
+                        class="btn btn-primary btn-sm btn-block action-404"
+                        >Choose Pro</a
+                      >
+                    </td>
+                    <td style="text-align: center">
+                      <a
+                        href="404.html"
+                        class="btn btn-outline btn-sm btn-block action-404"
+                        >Get Enterprise</a
+                      >
+                    </td>
                   </tr>
                 </tbody>
               </table>
@@ -734,7 +951,7 @@
         <div class="footer-top">
           <!-- Col 1: Stackly Logo with Social Media Links -->
           <div class="footer-brand">
-            <a href="404.html" class="action-404" aria-label="Stackly Home">
+            <a href="index.html" aria-label="Stackly Home">
               <img
                 src="assets/images/stackly-logo.webp"
                 alt="Stackly"

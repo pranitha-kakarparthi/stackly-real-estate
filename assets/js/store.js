@@ -529,6 +529,22 @@ function getNotifications() {
   }
 }
 
+function markAllNotificationsRead() {
+  initStorage();
+  const notifs = getNotifications().map((n) => ({ ...n, read: true }));
+  localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+  return notifs;
+}
+
+function markNotificationRead(id) {
+  initStorage();
+  const notifs = getNotifications().map((n) =>
+    n.id === id ? { ...n, read: true } : n
+  );
+  localStorage.setItem(STORAGE_KEYS.NOTIFICATIONS, JSON.stringify(notifs));
+  return notifs;
+}
+
 initStorage();
 
 window.StacklyStore = {
@@ -544,4 +560,6 @@ window.StacklyStore = {
   saveInquiry,
   getInquiries,
   getNotifications,
+  markAllNotificationsRead,
+  markNotificationRead,
 };

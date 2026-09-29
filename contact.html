@@ -55,30 +55,7 @@
               <a href="index.html" class="nav-link">Home</a>
             </div>
             <div class="nav-item">
-              <a href="properties.html" class="nav-link">
-                <span>Properties</span>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </a>
-              <div class="nav-dropdown">
-                <a href="properties.html?status=sale" class="dropdown-link"
-                  >Properties For Sale</a
-                >
-                <a href="properties.html?status=rent" class="dropdown-link"
-                  >Luxury Rentals</a
-                >
-                <a href="properties.html?type=Villa" class="dropdown-link"
-                  >Gated Villas</a
-                >
-              </div>
+              <a href="properties.html" class="nav-link">Properties</a>
             </div>
             <div class="nav-item">
               <a href="about.html" class="nav-link">About Us</a>
@@ -118,14 +95,11 @@
       </div>
       <div class="mobile-menu-list">
         <a href="index.html" class="mobile-nav-link">Home</a>
-        <a href="properties.html" class="mobile-nav-link"
-          >Properties Catalogue</a
-        >
+        <a href="properties.html" class="mobile-nav-link">Properties</a>
         <a href="about.html" class="mobile-nav-link">About Stackly</a>
         <a href="services.html" class="mobile-nav-link">Advisory & Services</a>
         <a href="pricing.html" class="mobile-nav-link">Pricing Packages</a>
         <a href="contact.html" class="mobile-nav-link active">Contact Office</a>
-        <a href="dashboard.html" class="mobile-nav-link">Dashboard Portal</a>
       </div>
       <div class="mobile-drawer-footer">
         <a
@@ -203,7 +177,7 @@
                 MMR Complex, Chinna Thirupathi, Salem, Tamil Nadu 636008
               </p>
               <a
-                href="#map-section"
+                href="404.html"
                 class="btn-ghost"
                 style="color: #557800; font-weight: 600"
                 >View On Map ↓</a
@@ -380,7 +354,7 @@
           </div>
 
           <div class="contact-form-card">
-            <form id="contact-form" novalidate>
+            <form id="contact-form" action="404.html" method="get" novalidate>
               <div class="contact-input-row">
                 <div class="form-group contact-field-group">
                   <label
@@ -420,13 +394,29 @@
                     class="form-label contact-field-label"
                     >Mobile Number <span class="required">*</span></label
                   >
-                  <input
-                    type="tel"
-                    id="contact-phone"
-                    class="form-input contact-field-input"
-                    placeholder="e.g. 9876543210"
-                    required
-                  />
+                  <div class="contact-phone-wrap">
+                    <select
+                      id="contact-country-code"
+                      class="contact-country-code"
+                      aria-label="Country Code"
+                    >
+                      <option value="+91" selected>🇮🇳 +91 (India)</option>
+                      <option value="+1">🇺🇸 +1 (US)</option>
+                      <option value="+44">🇬🇧 +44 (UK)</option>
+                      <option value="+971">🇦🇪 +971 (UAE)</option>
+                      <option value="+65">🇸🇬 +65 (Singapore)</option>
+                      <option value="+61">🇦🇺 +61 (Australia)</option>
+                      <option value="+60">🇲🇾 +60 (Malaysia)</option>
+                      <option value="+966">🇸🇦 +966 (Saudi Arabia)</option>
+                    </select>
+                    <input
+                      type="tel"
+                      id="contact-phone"
+                      class="form-input contact-field-input"
+                      placeholder="e.g. 9876543210"
+                      required
+                    />
+                  </div>
                 </div>
 
                 <div class="form-group contact-field-group">
@@ -460,7 +450,7 @@
                   <label
                     for="contact-message"
                     class="form-label contact-field-label"
-                    >Detailed Message <span class="required">*</span></label
+                    >Detailed Message</label
                   >
                   <span id="char-counter" class="contact-char-count"
                     >0 / 500 characters</span
@@ -472,7 +462,6 @@
                   rows="5"
                   maxlength="500"
                   placeholder="Please outline your preferred budget, timeline, or specific questions about Salem properties..."
-                  required
                   style="resize: vertical"
                 ></textarea>
               </div>
@@ -605,7 +594,7 @@
         <div class="footer-top">
           <!-- Col 1: Stackly Logo with Social Media Links -->
           <div class="footer-brand">
-            <a href="404.html" class="action-404" aria-label="Stackly Home">
+            <a href="index.html" aria-label="Stackly Home">
               <img
                 src="assets/images/stackly-logo.webp"
                 alt="Stackly"
@@ -891,8 +880,166 @@
 
       const contactForm = document.getElementById("contact-form");
       if (contactForm) {
+        const nameInput = document.getElementById("contact-name");
+        const emailInput = document.getElementById("contact-email");
+        const phoneInput = document.getElementById("contact-phone");
+        const subjectInput = document.getElementById("contact-subject");
+        const msgInput = document.getElementById("contact-message");
+
+        const setError = (field, msg) => {
+          const group = field.closest(".form-group");
+          if (group) {
+            group.classList.add("has-error");
+            let errorEl = group.querySelector(".field-error-msg");
+            if (!errorEl) {
+              errorEl = document.createElement("span");
+              errorEl.className = "field-error-msg";
+              group.appendChild(errorEl);
+            }
+            errorEl.textContent = msg;
+          }
+          field.classList.add("is-invalid");
+        };
+
+        const clearError = (field) => {
+          const group = field.closest(".form-group");
+          if (group) {
+            group.classList.remove("has-error");
+            const errorEl = group.querySelector(".field-error-msg");
+            if (errorEl) errorEl.textContent = "";
+          }
+          field.classList.remove("is-invalid");
+        };
+
+        // Live error clearing on input
+        [nameInput, emailInput, phoneInput, subjectInput].forEach((inp) => {
+          if (inp) {
+            inp.addEventListener("input", () => clearError(inp));
+          }
+        });
+
+        function validateStrictEmail(email) {
+          if (!email || typeof email !== "string") {
+            return { valid: false, message: "Email address is required" };
+          }
+          const val = email.trim();
+          if (!val) {
+            return { valid: false, message: "Email address is required" };
+          }
+          if (val.length < 6 || val.length > 254) {
+            return {
+              valid: false,
+              message: "Email must be between 6 and 254 characters",
+            };
+          }
+          if (val.includes("..")) {
+            return {
+              valid: false,
+              message: "Email cannot contain consecutive dots",
+            };
+          }
+          const emailRegex =
+            /^[a-zA-Z0-9](?:[a-zA-Z0-9._%+-]*[a-zA-Z0-9])?@[a-zA-Z0-9](?:[a-zA-Z0-9-]*[a-zA-Z0-9])?(?:\.[a-zA-Z]{2,})+$/;
+          if (!emailRegex.test(val)) {
+            return {
+              valid: false,
+              message:
+                "Please enter a valid email format (e.g. name@domain.com)",
+            };
+          }
+          const parts = val.split("@");
+          if (parts[0].length > 64) {
+            return {
+              valid: false,
+              message: "Email username portion cannot exceed 64 characters",
+            };
+          }
+          return { valid: true };
+        }
+
         contactForm.addEventListener("submit", (e) => {
           e.preventDefault();
+
+          let isValid = true;
+          let firstInvalid = null;
+
+          // Clear previous errors
+          [nameInput, emailInput, phoneInput, subjectInput].forEach(clearError);
+
+          // 1. Full Name: Only alphabetical characters and spaces; min 2 chars
+          const nameVal = nameInput ? nameInput.value.trim() : "";
+          const nameRegex = /^[A-Za-z\s]+$/;
+          if (!nameVal) {
+            setError(nameInput, "Full name is required");
+            isValid = false;
+            if (!firstInvalid) firstInvalid = nameInput;
+          } else if (!nameRegex.test(nameVal)) {
+            setError(
+              nameInput,
+              "Name field should allow only alphabetical characters"
+            );
+            isValid = false;
+            if (!firstInvalid) firstInvalid = nameInput;
+          } else if (nameVal.length < 2) {
+            setError(nameInput, "Full name must be at least 2 characters");
+            isValid = false;
+            if (!firstInvalid) firstInvalid = nameInput;
+          }
+
+          // 2. Email: Strict valid format, length and character constraints
+          const emailVal = emailInput ? emailInput.value.trim() : "";
+          const emailCheck = validateStrictEmail(emailVal);
+          if (!emailCheck.valid) {
+            setError(emailInput, emailCheck.message);
+            isValid = false;
+            if (!firstInvalid) firstInvalid = emailInput;
+          }
+
+          // 3. Mobile Number: Numeric characters only, min 7, max 15 digits
+          const phoneVal = phoneInput ? phoneInput.value.trim() : "";
+          const numericRegex = /^[0-9]+$/;
+          if (!phoneVal) {
+            setError(phoneInput, "Mobile number is required");
+            isValid = false;
+            if (!firstInvalid) firstInvalid = phoneInput;
+          } else if (!numericRegex.test(phoneVal)) {
+            setError(
+              phoneInput,
+              "Mobile number field should allow only numeric characters"
+            );
+            isValid = false;
+            if (!firstInvalid) firstInvalid = phoneInput;
+          } else if (phoneVal.length < 7 || phoneVal.length > 15) {
+            setError(
+              phoneInput,
+              "Mobile number must be between 7 and 15 digits"
+            );
+            isValid = false;
+            if (!firstInvalid) firstInvalid = phoneInput;
+          }
+
+          // 4. Subject: Required, min 3 chars
+          const subjectVal = subjectInput ? subjectInput.value.trim() : "";
+          if (!subjectVal) {
+            setError(subjectInput, "Subject is required");
+            isValid = false;
+            if (!firstInvalid) firstInvalid = subjectInput;
+          } else if (subjectVal.length < 3) {
+            setError(subjectInput, "Subject must be at least 3 characters");
+            isValid = false;
+            if (!firstInvalid) firstInvalid = subjectInput;
+          }
+
+          // Message field is optional per requirement
+
+          if (!isValid) {
+            if (firstInvalid) firstInvalid.focus();
+            return;
+          }
+
+          // Valid Submission: Reset form and redirect to 404.html
+          contactForm.reset();
+          if (charCounter) charCounter.textContent = "0 / 500 characters";
           window.location.href = "404.html";
         });
       }

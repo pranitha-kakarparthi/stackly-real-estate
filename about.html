@@ -54,32 +54,7 @@
             <div class="nav-item">
               <a href="index.html" class="nav-link">Home</a>
             </div>
-            <div class="nav-item">
-              <a href="properties.html" class="nav-link">
-                <span>Properties</span>
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <polyline points="6 9 12 15 18 9" />
-                </svg>
-              </a>
-              <div class="nav-dropdown">
-                <a href="properties.html?status=sale" class="dropdown-link"
-                  >Properties For Sale</a
-                >
-                <a href="properties.html?status=rent" class="dropdown-link"
-                  >Luxury Rentals</a
-                >
-                <a href="properties.html?type=Villa" class="dropdown-link"
-                  >Gated Villas</a
-                >
-              </div>
-            </div>
+            <div class="nav-item"><a href="properties.html" class="nav-link">Properties</a></div>
             <div class="nav-item">
               <a href="about.html" class="nav-link active">About Us</a>
             </div>
@@ -116,16 +91,13 @@
         />
         <button class="mobile-close-btn" aria-label="Close menu">✕</button>
       </div>
-      <div class="mobile-menu-list">
+            <div class="mobile-menu-list">
         <a href="index.html" class="mobile-nav-link">Home</a>
-        <a href="properties.html" class="mobile-nav-link"
-          >Properties Catalogue</a
-        >
+        <a href="properties.html" class="mobile-nav-link">Properties</a>
         <a href="about.html" class="mobile-nav-link active">About Stackly</a>
         <a href="services.html" class="mobile-nav-link">Advisory & Services</a>
         <a href="pricing.html" class="mobile-nav-link">Pricing Packages</a>
         <a href="contact.html" class="mobile-nav-link">Contact Office</a>
-        <a href="dashboard.html" class="mobile-nav-link">Dashboard Portal</a>
       </div>
       <div class="mobile-drawer-footer">
         <a
@@ -493,7 +465,42 @@
         </div>
       </section>
 
-      <!-- Section 5: Executive Leadership & Senior Advisory Brokers (Unique portraits agent-5, agent-1, agent-2, agent-6)
+            <!-- Architectural Innovation & Construction Craftsmanship Section -->
+      <section class="section animate-scale">
+        <div class="container">
+          <div class="section-header">
+            <span class="section-subtitle">Engineering &amp; Architecture</span>
+            <h2 class="section-title">Built On Structural Rigor &amp; Craftsmanship</h2>
+            <p class="section-desc">From our Salem headquarters to expansive Yercaud hill retreats, our projects define modern Tamil Nadu luxury living.</p>
+          </div>
+
+          <div class="grid-2" style="gap: 2.5rem; align-items: center;">
+            <div class="img-zoom-card" style="height: 380px; box-shadow: var(--shadow-xl); border: 2px solid #ffffff;">
+              <img src="assets/images/showcase/building1.webp" alt="Stackly Corporate Architecture" loading="lazy" style="height: 100%; object-fit: cover;">
+            </div>
+            <div>
+              <h3 style="font-size: 1.6rem; color: var(--color-dark); margin-bottom: 1rem; font-weight: 700;">Landmark Corporate &amp; Residential Developments</h3>
+              <p style="color: var(--color-text-muted); line-height: 1.7; margin-bottom: 1.25rem;">
+                Every Stackly development integrates high-grade seismic-resistant RCC frames, heat-reflective terracotta facade elements, and automated smart-grid electrical installations designed for longevity.
+              </p>
+              <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
+                <li style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; color: var(--color-dark);">
+                  <span style="color: var(--color-primary); font-size: 1.1rem;">✓</span> 100% DTCP &amp; Tamil Nadu RERA Registered Assets
+                </li>
+                <li style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; color: var(--color-dark);">
+                  <span style="color: var(--color-primary); font-size: 1.1rem;">✓</span> Sustainable Solar-Ready Rooftops &amp; Rainwater Harvesting
+                </li>
+                <li style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; color: var(--color-dark);">
+                  <span style="color: var(--color-primary); font-size: 1.1rem;">✓</span> Institutional Handover with 10-Year Structural Warranty
+                </li>
+              </ul>
+              <a href="404.html" class="btn btn-primary btn-shine action-404">Download Engineering Dossier (PDF)</a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+<!-- Section 5: Executive Leadership & Senior Advisory Brokers (Unique portraits agent-5, agent-1, agent-2, agent-6)
          Action buttons redirect to 404 per requirement -->
       <section class="section">
         <div class="container">
@@ -734,7 +741,7 @@
         <div class="footer-top">
           <!-- Col 1: Stackly Logo with Social Media Links -->
           <div class="footer-brand">
-            <a href="404.html" class="action-404" aria-label="Stackly Home">
+            <a href="index.html" aria-label="Stackly Home">
               <img
                 src="assets/images/stackly-logo.webp"
                 alt="Stackly"

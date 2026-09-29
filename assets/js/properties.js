@@ -250,8 +250,8 @@ function openQuickViewModal(propId) {
             </div>
           </div>
           <div style="display: flex; gap: 0.75rem;">
-            <a href="tel:${p.agent.phone}" class="btn btn-outline btn-sm">Call Agent</a>
-            <a href="contact.html?property=${encodeURIComponent(p.title)}" class="btn btn-primary btn-sm">Schedule Visit</a>
+            <a href="404.html" class="btn btn-outline btn-sm action-404">Call Agent</a>
+            <a href="404.html" class="btn btn-primary btn-sm action-404">Schedule Visit</a>
           </div>
         </div>
       </div>
@@ -260,12 +260,29 @@ function openQuickViewModal(propId) {
 
   modalOverlay.classList.add("open");
 
+  // Disable scroll on main content while modal is open
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.overflow = "hidden";
+
   const closeBtn = modalOverlay.querySelector(".modal-close-btn");
-  const closeModal = () => modalOverlay.classList.remove("open");
-  closeBtn.addEventListener("click", closeModal);
+  const closeModal = () => {
+    modalOverlay.classList.remove("open");
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+    document.removeEventListener("keydown", escModalHandler);
+  };
+
+  const escModalHandler = (e) => {
+    if (e.key === "Escape" && modalOverlay.classList.contains("open")) {
+      closeModal();
+    }
+  };
+
+  if (closeBtn) closeBtn.addEventListener("click", closeModal);
   modalOverlay.addEventListener("click", (e) => {
     if (e.target === modalOverlay) closeModal();
   });
+  document.addEventListener("keydown", escModalHandler);
 }
 
 /* ==========================================================================
