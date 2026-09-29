@@ -73,6 +73,8 @@ html {
   scroll-behavior: smooth;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  max-width: 100vw;
+  overflow-x: hidden;
 }
 
 body {
@@ -80,7 +82,9 @@ body {
   color: var(--color-text-main);
   background-color: var(--color-surface);
   line-height: 1.6;
+  max-width: 100vw;
   overflow-x: hidden;
+  position: relative;
 }
 
 img,
@@ -714,6 +718,22 @@ ol {
   gap: 2rem;
 }
 
+.grid-gap-lg {
+  gap: 4rem;
+}
+
+@media (max-width: 991px) {
+  .grid-gap-lg {
+    gap: 2.5rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .grid-gap-lg {
+    gap: 1.5rem !important;
+  }
+}
+
 .grid-3 {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -763,9 +783,12 @@ ol {
 .breadcrumbs {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 0.6rem;
   font-size: 0.875rem;
   color: #94a3b8;
+  margin-bottom: 1rem;
+  line-height: 1.5;
 }
 
 .breadcrumbs a {
@@ -798,24 +821,25 @@ ol {
   padding-bottom: 4rem;
 }
 
-@media (max-width: 1200px) {
-  .footer-top {
-    grid-template-columns: 1.4fr 1fr 1fr;
-    gap: 2.5rem;
-  }
-}
-
-@media (max-width: 860px) {
+@media (max-width: 1100px) {
   .footer-top {
     grid-template-columns: 1fr 1fr;
-    gap: 2rem;
+    gap: 2.5rem 2rem;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
+    max-width: 600px;
   }
 }
 
-@media (max-width: 560px) {
+@media (max-width: 600px) {
   .footer-top {
     grid-template-columns: 1fr;
     gap: 2rem;
+  }
+  .footer-brand {
+    grid-column: auto;
+    max-width: 100%;
   }
 }
 
@@ -1055,10 +1079,37 @@ ol {
 }
 
 @media (max-width: 768px) {
+  .container {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+  .header-navbar {
+    height: 68px;
+    gap: 0.75rem;
+  }
+  .brand-logo-link {
+    flex-shrink: 0;
+    margin-right: auto;
+  }
+  .brand-logo-img {
+    height: 38px;
+    padding: 4px 10px;
+  }
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+  .header-actions .btn {
+    padding: 0.45rem 0.85rem;
+    font-size: 0.8125rem;
+    white-space: nowrap;
+  }
   .grid-2,
   .grid-3,
   .grid-4 {
     grid-template-columns: 1fr;
+    gap: 1.25rem;
   }
   .section {
     padding: 3.5rem 0;
@@ -1067,14 +1118,93 @@ ol {
     display: none; /* Mobile view prioritizes clean header */
   }
   .footer-top {
-    grid-template-columns: 1fr;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+  }
+  .footer-brand {
+    grid-column: 1 / -1;
   }
   .footer-bottom {
     flex-direction: column;
     text-align: center;
+    gap: 1rem;
   }
 }
 
+@media (max-width: 600px) {
+  .footer-top {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+  .footer-brand {
+    grid-column: auto;
+  }
+}
+
+/* Extra Small Screen Adaptations (< 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+  .header-navbar {
+    height: 62px;
+    gap: 0.5rem;
+  }
+  .brand-logo-img {
+    height: 34px;
+    padding: 3px 6px;
+    max-width: 110px;
+  }
+  .header-actions {
+    gap: 0.4rem;
+  }
+  .header-actions .btn {
+    padding: 0.38rem 0.65rem;
+    font-size: 0.775rem;
+  }
+  .hamburger-btn {
+    width: 36px;
+    height: 36px;
+    padding: 6px;
+    margin-left: 0.2rem;
+  }
+  .section {
+    padding: 2.75rem 0;
+  }
+}
+
+/* When Mobile Menu is Open: Responsive Alignment of Sign-In & Register */
+.mobile-drawer-footer {
+  margin-top: auto;
+  padding-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.mobile-drawer-footer .btn {
+  width: 100%;
+  min-height: 48px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 480px) and (max-width: 1100px) {
+  .mobile-drawer-footer {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+    align-items: center;
+  }
+  .mobile-drawer-footer .btn {
+    width: 100%;
+  }
+}
 
 /* ==========================================================================
    MOBILE NAV PROPERTIES DROPDOWN FOR SMALLER SCREENS
@@ -1142,8 +1272,14 @@ ol {
 }
 
 @keyframes mobileSubmenuSlide {
-  from { opacity: 0; transform: translateY(-8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .mobile-sub-link {
@@ -1153,7 +1289,9 @@ ol {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition:
+    color 0.2s ease,
+    transform 0.2s ease;
 }
 
 .mobile-sub-link:hover,
@@ -1177,7 +1315,9 @@ ol {
 .animate-scale {
   opacity: 0;
   transform: scale(0.9);
-  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  transition:
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1);
   will-change: transform, opacity;
 }
 
@@ -1190,7 +1330,9 @@ ol {
 .reveal-fade-up {
   opacity: 0;
   transform: translateY(28px);
-  transition: transform 0.75s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.75s ease;
+  transition:
+    transform 0.75s cubic-bezier(0.16, 1, 0.3, 1),
+    opacity 0.75s ease;
   will-change: transform, opacity;
 }
 
@@ -1212,7 +1354,12 @@ ol {
   left: -75%;
   width: 50%;
   height: 200%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
   transform: rotate(25deg);
   transition: none;
   pointer-events: none;
@@ -1225,9 +1372,18 @@ ol {
 
 /* 4. Pulse Play Badge */
 @keyframes pulsePlay {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(146, 200, 0, 0.7); }
-  70% { transform: scale(1.08); box-shadow: 0 0 0 20px rgba(146, 200, 0, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(146, 200, 0, 0); }
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(146, 200, 0, 0.7);
+  }
+  70% {
+    transform: scale(1.08);
+    box-shadow: 0 0 0 20px rgba(146, 200, 0, 0);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(146, 200, 0, 0);
+  }
 }
 
 .pulse-badge {
@@ -1239,7 +1395,9 @@ ol {
   display: inline-block;
   color: var(--color-primary);
   font-weight: 800;
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition:
+    opacity 0.35s ease,
+    transform 0.35s ease;
 }
 
 .changing-text-rotator.fade-out {
@@ -1256,7 +1414,9 @@ ol {
 .showcase-banner-section {
   position: relative;
   padding: 6rem 0;
-  background: linear-gradient(rgba(27, 32, 50, 0.88), rgba(19, 23, 34, 0.94)), url('../images/showcase/video.webp') center/cover no-repeat fixed;
+  background:
+    linear-gradient(rgba(27, 32, 50, 0.88), rgba(19, 23, 34, 0.94)),
+    url("../images/showcase/video.webp") center/cover no-repeat fixed;
   color: #ffffff;
   overflow: hidden;
 }
@@ -1285,4 +1445,75 @@ ol {
 
 .img-zoom-card:hover img {
   transform: scale(1.08);
+}
+
+/* ==========================================================================
+   GLOBAL FORM LABEL & MANDATORY ASTERISK POSITIONING
+   Ensures * character is always immediately adjacent to the label text across all forms
+   ========================================================================== */
+.form-label,
+label.form-label,
+.contact-field-label {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.25rem !important;
+}
+
+.form-label .required,
+.contact-field-label .required,
+label .required,
+.required {
+  color: var(--color-danger, #ef4444);
+  font-weight: 700;
+  margin-left: 2px;
+  display: inline !important;
+}
+
+/* ==========================================================================
+   SMOOTH AOS (ANIMATE ON SCROLL) ENGINE
+   ========================================================================== */
+[data-aos] {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-duration: 0.8s;
+  transition-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+  will-change: opacity, transform;
+}
+
+[data-aos="fade-up"] {
+  transform: translateY(35px);
+}
+
+[data-aos="fade-down"] {
+  transform: translateY(-35px);
+}
+
+[data-aos="fade-right"] {
+  transform: translateX(-35px);
+}
+
+[data-aos="fade-left"] {
+  transform: translateX(35px);
+}
+
+[data-aos="zoom-in"] {
+  transform: scale(0.92);
+}
+
+[data-aos="zoom-in-up"] {
+  transform: translateY(30px) scale(0.92);
+}
+
+[data-aos].aos-animate {
+  opacity: 1;
+  transform: translate(0) scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-aos] {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
 }

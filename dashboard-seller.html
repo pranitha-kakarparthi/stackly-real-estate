@@ -30,6 +30,38 @@
             height="38"
           />
         </a>
+        <button
+          id="dash-sidebar-collapse"
+          class="dash-sidebar-collapse-btn"
+          aria-label="Collapse sidebar"
+          title="Collapse sidebar"
+        >
+          <svg
+            class="icon-desktop-collapse"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <polyline points="15 18 9 12 15 6" />
+          </svg>
+          <svg
+            class="icon-mobile-close"
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
       </div>
 
       <!-- Active User & Role Display -->
@@ -37,7 +69,9 @@
         <div class="sidebar-avatar dash-user-initials">US</div>
         <div class="sidebar-user-info">
           <div class="sidebar-user-name dash-user-name">Loading...</div>
-          <span class="sidebar-role-badge dash-user-role">SELLER & DEVELOPER</span>
+          <span class="sidebar-role-badge dash-user-role"
+            >SELLER & DEVELOPER</span
+          >
         </div>
       </div>
 
@@ -193,7 +227,7 @@
               <line x1="3" y1="18" x2="21" y2="18" />
             </svg>
           </button>
-          <div>
+          <div class="topbar-greeting-wrap">
             <h2 class="dashboard-greeting-title" id="dash-greeting-text">
               Welcome back!
             </h2>
@@ -210,8 +244,6 @@
         </div>
 
         <div class="topbar-right">
-
-
           <!-- Notification Bell -->
           <div class="notif-wrap">
             <button
@@ -235,7 +267,14 @@
             <div class="notif-dropdown" id="dash-notif-dropdown">
               <div class="notif-header">
                 <span>Notifications</span>
-                <button type="button" id="dash-mark-all-read" class="dash-mark-read-btn" title="Mark all notifications as read">Mark read</button>
+                <button
+                  type="button"
+                  id="dash-mark-all-read"
+                  class="dash-mark-read-btn"
+                  title="Mark all notifications as read"
+                >
+                  Mark read
+                </button>
               </div>
               <div id="dash-notif-list"></div>
             </div>

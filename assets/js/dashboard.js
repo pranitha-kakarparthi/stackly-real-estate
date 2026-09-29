@@ -71,12 +71,113 @@ function initHeaderUI(user) {
     });
   });
 
-  // Mobile sidebar toggle
+  // Sidebar toggle & collapse controller (Large Screen Rail Collapse & Small Screen Drawer)
   const toggleBtn = document.getElementById("dash-sidebar-toggle");
+  const collapseBtn = document.getElementById("dash-sidebar-collapse");
   const sidebar = document.querySelector(".dashboard-sidebar");
+  const main = document.querySelector(".dashboard-main");
+
+  let overlay = document.querySelector(".dash-sidebar-overlay");
+  if (!overlay && sidebar) {
+    overlay = document.createElement("div");
+    overlay.className = "dash-sidebar-overlay";
+    document.body.appendChild(overlay);
+  }
+
+  // Desktop rail collapse toggle
+  const toggleDesktopCollapse = () => {
+    if (!sidebar) return;
+    const isCollapsed = sidebar.classList.toggle("collapsed");
+    if (main) {
+      main.classList.toggle("sidebar-collapsed", isCollapsed);
+    }
+    if (collapseBtn) {
+      collapseBtn.setAttribute("aria-expanded", String(!isCollapsed));
+      collapseBtn.setAttribute(
+        "title",
+        isCollapsed ? "Expand sidebar" : "Collapse sidebar"
+      );
+    }
+    try {
+      localStorage.setItem(
+        "stackly_sidebar_collapsed",
+        isCollapsed ? "true" : "false"
+      );
+    } catch (_) {}
+  };
+
+  // Restore persisted desktop sidebar collapse state on larger screens
+  if (window.innerWidth > 860 && sidebar) {
+    try {
+      const savedCollapsed =
+        localStorage.getItem("stackly_sidebar_collapsed") === "true";
+      if (savedCollapsed) {
+        sidebar.classList.add("collapsed");
+        if (main) main.classList.add("sidebar-collapsed");
+        if (collapseBtn) {
+          collapseBtn.setAttribute("aria-expanded", "false");
+          collapseBtn.setAttribute("title", "Expand sidebar");
+        }
+      }
+    } catch (_) {}
+  }
+
+  // Mobile drawer controls
+  const openSidebar = () => {
+    if (!sidebar) return;
+    sidebar.classList.add("mobile-open");
+    if (overlay) overlay.classList.add("active");
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+  };
+
+  const closeSidebar = () => {
+    if (!sidebar) return;
+    sidebar.classList.remove("mobile-open");
+    if (overlay) overlay.classList.remove("active");
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  };
+
   if (toggleBtn && sidebar) {
     toggleBtn.addEventListener("click", () => {
-      sidebar.classList.toggle("mobile-open");
+      if (window.innerWidth <= 860) {
+        if (sidebar.classList.contains("mobile-open")) {
+          closeSidebar();
+        } else {
+          openSidebar();
+        }
+      } else {
+        toggleDesktopCollapse();
+      }
+    });
+  }
+
+  if (collapseBtn) {
+    collapseBtn.addEventListener("click", () => {
+      if (window.innerWidth <= 860) {
+        closeSidebar();
+      } else {
+        toggleDesktopCollapse();
+      }
+    });
+  }
+
+  if (overlay) {
+    overlay.addEventListener("click", closeSidebar);
+  }
+
+  if (sidebar) {
+    sidebar.querySelectorAll(".dash-nav-link").forEach((link) => {
+      const label = link.querySelector("span");
+      if (label && !link.getAttribute("title")) {
+        link.setAttribute("title", label.textContent.trim());
+      }
+      link.addEventListener("click", () => {
+        if (window.innerWidth <= 860) {
+          closeSidebar();
+        }
+      });
     });
   }
 }
@@ -298,11 +399,13 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Quick Actions:</span>
-        <a href="404.html" class="action-chip action-404">+ Add New Listing</a>
-        <a href="404.html" class="action-chip action-404">Download Valuation Report</a>
-        <a href="404.html" class="action-chip action-404">Review Buyer Offers</a>
-        <a href="404.html" class="action-chip action-404">Book 4K Drone Scan</a>
-        <a href="404.html" class="action-chip action-404">Manage Showing Hours</a>
+        <div class="quick-actions-chips">
+          <a href="404.html" class="action-chip action-404">+ Add New Listing</a>
+          <a href="404.html" class="action-chip action-404">Download Valuation Report</a>
+          <a href="404.html" class="action-chip action-404">Review Buyer Offers</a>
+          <a href="404.html" class="action-chip action-404">Book 4K Drone Scan</a>
+          <a href="404.html" class="action-chip action-404">Manage Showing Hours</a>
+        </div>
       </div>
 
       <!-- S1: Seller KPIs -->
@@ -390,11 +493,13 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Broker Console:</span>
-        <a href="404.html" class="action-chip action-404">+ Add Client Lead</a>
-        <a href="404.html" class="action-chip action-404">Schedule VIP Site Escort</a>
-        <a href="404.html" class="action-chip action-404">Draft Mandate Agreement</a>
-        <a href="404.html" class="action-chip action-404">Commission Calculator</a>
-        <a href="404.html" class="action-chip action-404">Export Pipeline Ledger</a>
+        <div class="quick-actions-chips">
+          <a href="404.html" class="action-chip action-404">+ Add Client Lead</a>
+          <a href="404.html" class="action-chip action-404">Schedule VIP Site Escort</a>
+          <a href="404.html" class="action-chip action-404">Draft Mandate Agreement</a>
+          <a href="404.html" class="action-chip action-404">Commission Calculator</a>
+          <a href="404.html" class="action-chip action-404">Export Pipeline Ledger</a>
+        </div>
       </div>
 
       <!-- S1: Agent KPIs -->
@@ -470,13 +575,15 @@ function renderOverviewView(container, user, role) {
   } else if (role === "manager") {
     container.innerHTML = `
       <!-- Quick Actions Toolbar -->
-      <div class="quick-actions-bar">
+      <div class="quick-actions-bar property-desk-bar">
         <span class="quick-actions-label">Property Desk:</span>
-        <a href="404.html" class="action-chip action-404">+ Dispatch Vendor</a>
-        <a href="404.html" class="action-chip action-404">Issue Rent Invoices</a>
-        <a href="404.html" class="action-chip action-404">Generate Tenancy Lease</a>
-        <a href="404.html" class="action-chip action-404">Municipal Tax Ledger</a>
-        <a href="404.html" class="action-chip action-404">Emergency Maintenance</a>
+        <div class="quick-actions-chips">
+          <a href="404.html" class="action-chip action-404">+ Dispatch Vendor</a>
+          <a href="404.html" class="action-chip action-404">Issue Rent Invoices</a>
+          <a href="404.html" class="action-chip action-404">Generate Tenancy Lease</a>
+          <a href="404.html" class="action-chip action-404">Municipal Tax Ledger</a>
+          <a href="404.html" class="action-chip action-404">Emergency Maintenance</a>
+        </div>
       </div>
 
       <!-- S1: Manager KPIs -->
@@ -642,11 +749,13 @@ function renderOverviewView(container, user, role) {
       <!-- Quick Actions Toolbar -->
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Buyer Shortcuts:</span>
-        <a href="404.html" class="action-chip action-404">+ Request VIP Site Tour</a>
-        <a href="404.html" class="action-chip action-404">Compare Shortlist</a>
-        <a href="404.html" class="action-chip action-404">Download Loan Sanction</a>
-        <a href="404.html" class="action-chip action-404">Title Verification Lookup</a>
-        <a href="404.html" class="action-chip action-404">Talk to Concierge</a>
+        <div class="quick-actions-chips">
+          <a href="404.html" class="action-chip action-404">+ Request VIP Site Tour</a>
+          <a href="404.html" class="action-chip action-404">Compare Shortlist</a>
+          <a href="404.html" class="action-chip action-404">Download Loan Sanction</a>
+          <a href="404.html" class="action-chip action-404">Title Verification Lookup</a>
+          <a href="404.html" class="action-chip action-404">Talk to Concierge</a>
+        </div>
       </div>
 
       <!-- S1: Buyer KPIs -->
@@ -736,10 +845,12 @@ function renderPortfolioView(container, user, role) {
     container.innerHTML = `
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Portfolio Tools:</span>
-        <a href="404.html" class="action-chip action-404">+ Add New Property</a>
-        <a href="404.html" class="action-chip action-404">Download Valuation Dossier</a>
-        <a href="404.html" class="action-chip action-404">Manage Digital 3D Tour</a>
-        <a href="404.html" class="action-chip action-404">Export Tax Records</a>
+        <div class="quick-actions-chips">
+          <a href="404.html" class="action-chip action-404">+ Add New Property</a>
+          <a href="404.html" class="action-chip action-404">Download Valuation Dossier</a>
+          <a href="404.html" class="action-chip action-404">Manage Digital 3D Tour</a>
+          <a href="404.html" class="action-chip action-404">Export Tax Records</a>
+        </div>
       </div>
 
       <!-- S1: Portfolio Valuation Summary -->
@@ -818,10 +929,12 @@ function renderPortfolioView(container, user, role) {
     container.innerHTML = `
       <div class="quick-actions-bar">
         <span class="quick-actions-label">Portfolio Tools:</span>
-        <a href="404.html" class="action-chip action-404">Download Title Dossier</a>
-        <a href="404.html" class="action-chip action-404">Export Acquisition Ledger</a>
-        <a href="404.html" class="action-chip action-404">Book Surveyor Visit</a>
-        <a href="404.html" class="action-chip action-404">Request 3D Blueprints</a>
+        <div class="quick-actions-chips">
+          <a href="404.html" class="action-chip action-404">Download Title Dossier</a>
+          <a href="404.html" class="action-chip action-404">Export Acquisition Ledger</a>
+          <a href="404.html" class="action-chip action-404">Book Surveyor Visit</a>
+          <a href="404.html" class="action-chip action-404">Request 3D Blueprints</a>
+        </div>
       </div>
 
       <!-- S1: Buyer Portfolio KPIs -->
@@ -907,10 +1020,12 @@ function renderLeadsView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Leads Management:</span>
-      <a href="404.html" class="action-chip action-404">+ Add Inbound Inquiry</a>
-      <a href="404.html" class="action-chip action-404">Export CRM Records</a>
-      <a href="404.html" class="action-chip action-404">Broadcast WhatsApp Alert</a>
-      <a href="404.html" class="action-chip action-404">Schedule Follow-up Call</a>
+      <div class="quick-actions-chips">
+        <a href="404.html" class="action-chip action-404">+ Add Inbound Inquiry</a>
+        <a href="404.html" class="action-chip action-404">Export CRM Records</a>
+        <a href="404.html" class="action-chip action-404">Broadcast WhatsApp Alert</a>
+        <a href="404.html" class="action-chip action-404">Schedule Follow-up Call</a>
+      </div>
     </div>
 
     <!-- S1: Leads & Inquiries KPIs -->
@@ -1141,10 +1256,12 @@ function renderAnalyticsView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Market Intelligence:</span>
-      <a href="404.html" class="action-chip action-404">Download Salem Market Report</a>
-      <a href="404.html" class="action-chip action-404">Yield Sensitivity Matrix</a>
-      <a href="404.html" class="action-chip action-404">5-Year Appreciation Model</a>
-      <a href="404.html" class="action-chip action-404">Print Locality Index</a>
+      <div class="quick-actions-chips">
+        <a href="404.html" class="action-chip action-404">Download Salem Market Report</a>
+        <a href="404.html" class="action-chip action-404">Yield Sensitivity Matrix</a>
+        <a href="404.html" class="action-chip action-404">5-Year Appreciation Model</a>
+        <a href="404.html" class="action-chip action-404">Print Locality Index</a>
+      </div>
     </div>
 
     <!-- S1: Analytics KPIs -->
@@ -1228,21 +1345,22 @@ function renderAnalyticsView(container, user, role) {
         </div>
 
         <!-- Visual Comparative Yield Telemetry Deck -->
+        <!-- Visual Comparative Yield Telemetry Deck -->
         <div class="yield-bars-deck">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.25rem;">
-            <h4 style="font-size: 0.9375rem; font-weight: 700; color: var(--color-dark); margin: 0;">Market Realized Gross Yield Benchmarks</h4>
-            <span style="font-size: 0.75rem; color: var(--color-text-muted); font-weight: 500;">Indexed against 4BHK Luxury Villas &amp; Penthouse Assets</span>
+          <div class="yield-deck-header">
+            <h4 class="yield-deck-title">Market Realized Gross Yield Benchmarks</h4>
+            <span class="yield-deck-subtitle">Indexed against 4BHK Luxury Villas &amp; Penthouse Assets</span>
           </div>
 
           <!-- Salem -->
           <div class="yield-bar-row">
             <div class="yield-bar-info">
               <div class="yield-bar-location">
-                <span>📍 Salem Luxury Enclaves (Fairlands &amp; Chinna Thirupathi)</span>
+                <span class="yield-loc-name">📍 Salem Luxury Enclaves (Fairlands &amp; Chinna Thirupathi)</span>
                 <span class="yield-bar-badge-pill badge-top-performer">★ Stackly Outperformer</span>
               </div>
               <div class="yield-bar-nums">
-                <span>7.8% Gross</span>
+                <span class="yield-gross">7.8% Gross</span>
                 <span class="yield-bar-net">(Net: 7.1%)</span>
               </div>
             </div>
@@ -1255,11 +1373,11 @@ function renderAnalyticsView(container, user, role) {
           <div class="yield-bar-row">
             <div class="yield-bar-info">
               <div class="yield-bar-location">
-                <span>📍 Coimbatore Prime (Race Course &amp; Avinashi Rd)</span>
+                <span class="yield-loc-name">📍 Coimbatore Prime (Race Course &amp; Avinashi Rd)</span>
                 <span class="yield-bar-badge-pill badge-metro">Regional Tier-2</span>
               </div>
               <div class="yield-bar-nums">
-                <span>5.8% Gross</span>
+                <span class="yield-gross">5.8% Gross</span>
                 <span class="yield-bar-net">(Net: 5.1%)</span>
               </div>
             </div>
@@ -1272,11 +1390,11 @@ function renderAnalyticsView(container, user, role) {
           <div class="yield-bar-row">
             <div class="yield-bar-info">
               <div class="yield-bar-location">
-                <span>📍 Hyderabad IT Corridor (Hitec City &amp; Kokapet)</span>
+                <span class="yield-loc-name">📍 Hyderabad IT Corridor (Hitec City &amp; Kokapet)</span>
                 <span class="yield-bar-badge-pill badge-metro">Tier-1 IT Hub</span>
               </div>
               <div class="yield-bar-nums">
-                <span>4.8% Gross</span>
+                <span class="yield-gross">4.8% Gross</span>
                 <span class="yield-bar-net">(Net: 4.0%)</span>
               </div>
             </div>
@@ -1289,11 +1407,11 @@ function renderAnalyticsView(container, user, role) {
           <div class="yield-bar-row">
             <div class="yield-bar-info">
               <div class="yield-bar-location">
-                <span>📍 Bangalore Prime (Indiranagar &amp; Whitefield)</span>
+                <span class="yield-loc-name">📍 Bangalore Prime (Indiranagar &amp; Whitefield)</span>
                 <span class="yield-bar-badge-pill badge-metro">Tier-1 Capital</span>
               </div>
               <div class="yield-bar-nums">
-                <span>4.2% Gross</span>
+                <span class="yield-gross">4.2% Gross</span>
                 <span class="yield-bar-net">(Net: 3.4%)</span>
               </div>
             </div>
@@ -1306,11 +1424,11 @@ function renderAnalyticsView(container, user, role) {
           <div class="yield-bar-row">
             <div class="yield-bar-info">
               <div class="yield-bar-location">
-                <span>📍 Chennai Coastal Corridor (ECR &amp; OMR)</span>
+                <span class="yield-loc-name">📍 Chennai Coastal Corridor (ECR &amp; OMR)</span>
                 <span class="yield-bar-badge-pill badge-metro">Tier-1 Metro</span>
               </div>
               <div class="yield-bar-nums">
-                <span>3.6% Gross</span>
+                <span class="yield-gross">3.6% Gross</span>
                 <span class="yield-bar-net">(Net: 2.9%)</span>
               </div>
             </div>
@@ -1323,11 +1441,11 @@ function renderAnalyticsView(container, user, role) {
           <div class="yield-bar-row">
             <div class="yield-bar-info">
               <div class="yield-bar-location">
-                <span>📍 Mumbai Ultra-Luxury (Worli &amp; Bandra West)</span>
+                <span class="yield-loc-name">📍 Mumbai Ultra-Luxury (Worli &amp; Bandra West)</span>
                 <span class="yield-bar-badge-pill badge-metro">Tier-1 High Base</span>
               </div>
               <div class="yield-bar-nums">
-                <span>2.8% Gross</span>
+                <span class="yield-gross">2.8% Gross</span>
                 <span class="yield-bar-net">(Net: 2.1%)</span>
               </div>
             </div>
@@ -1456,10 +1574,12 @@ function renderAdvisoryView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Advisory Desk:</span>
-      <a href="404.html" class="action-chip action-404">Request 30-Year Title Search</a>
-      <a href="404.html" class="action-chip action-404">NRI Consular Legal Hotline</a>
-      <a href="404.html" class="action-chip action-404">Structural Engineer Audit</a>
-      <a href="404.html" class="action-chip action-404">Capital Gains 54EC Consultation</a>
+      <div class="quick-actions-chips">
+        <a href="404.html" class="action-chip action-404">Request 30-Year Title Search</a>
+        <a href="404.html" class="action-chip action-404">NRI Consular Legal Hotline</a>
+        <a href="404.html" class="action-chip action-404">Structural Engineer Audit</a>
+        <a href="404.html" class="action-chip action-404">Capital Gains 54EC Consultation</a>
+      </div>
     </div>
 
     <!-- S1: Advisory Desk KPIs -->
@@ -1540,11 +1660,13 @@ function renderSettingsView(container, user, role) {
     <!-- Quick Actions Toolbar -->
     <div class="quick-actions-bar">
       <span class="quick-actions-label">Account Controls:</span>
-      <a href="404.html" class="action-chip action-404">Update Profile Details</a>
-      <a href="404.html" class="action-chip action-404">Change Password</a>
-      <a href="404.html" class="action-chip action-404">Upload Identity Proof</a>
-      <a href="404.html" class="action-chip action-404">Manage 2FA Devices</a>
-      <a href="404.html" class="action-chip action-404">Delete Account</a>
+      <div class="quick-actions-chips">
+        <a href="404.html" class="action-chip action-404">Update Profile Details</a>
+        <a href="404.html" class="action-chip action-404">Change Password</a>
+        <a href="404.html" class="action-chip action-404">Upload Identity Proof</a>
+        <a href="404.html" class="action-chip action-404">Manage 2FA Devices</a>
+        <a href="404.html" class="action-chip action-404">Delete Account</a>
+      </div>
     </div>
 
     <!-- S1: Security Health KPIs -->

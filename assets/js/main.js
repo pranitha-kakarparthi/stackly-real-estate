@@ -297,6 +297,39 @@ function initSmoothAnimations() {
     animElements.forEach((el) => el.classList.add("show"));
   }
 
+  // AOS (Animate On Scroll) Engine
+  const aosElements = document.querySelectorAll("[data-aos]");
+  if (aosElements.length) {
+    if ("IntersectionObserver" in window) {
+      const aosObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              const delay = entry.target.getAttribute("data-aos-delay");
+              if (delay) {
+                setTimeout(
+                  () => {
+                    entry.target.classList.add("aos-animate");
+                  },
+                  parseInt(delay, 10)
+                );
+              } else {
+                entry.target.classList.add("aos-animate");
+              }
+            }
+          });
+        },
+        {
+          threshold: 0.08,
+          rootMargin: "0px 0px -20px 0px",
+        }
+      );
+      aosElements.forEach((el) => aosObserver.observe(el));
+    } else {
+      aosElements.forEach((el) => el.classList.add("aos-animate"));
+    }
+  }
+
   // Dynamic Tagline Rotator
   const textRotator = document.querySelector(".changing-text-rotator");
   if (textRotator) {

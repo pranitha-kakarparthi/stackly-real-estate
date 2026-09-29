@@ -367,10 +367,10 @@ function initSignUpForm() {
 
     window.StacklyStore.saveUser(newUser);
 
-    // Exact user requirement: Reset form with success message displayed and after 1 second redirect to login page
+    // Upon all mandatory fields, sign up form should redirect to sign in page
     form.reset();
     window.showToast(
-      "Account created successfully! Redirecting to login...",
+      "Account created successfully! Redirecting to sign in page...",
       "success"
     );
 
@@ -443,6 +443,13 @@ function initSignInForm() {
     const passwordCheck = validateStrictPassword(password.value);
     if (!passwordCheck.valid) {
       setError(password, passwordCheck.message);
+      if (!firstInvalidField) firstInvalidField = password;
+    }
+
+    // Role is a mandatory field in signin and signup page, as a part of form validation, select a role
+    if (!role || !role.value) {
+      setError(role, "Please select your role");
+      if (!firstInvalidField) firstInvalidField = role;
     }
 
     if (firstInvalidField) {
@@ -456,8 +463,7 @@ function initSignInForm() {
       (u) => u.email.toLowerCase() === emailVal.toLowerCase()
     );
 
-    const selectedRole =
-      role && role.value ? role.value : existing ? existing.role : "Buyer";
+    const selectedRole = role.value;
 
     // Create session user (works universally with any valid email and password)
     const displayName = existing
@@ -480,6 +486,7 @@ function initSignInForm() {
       "success"
     );
 
+    // Upon all mandatory fields, sign in form should redirect to dashboard page
     setTimeout(() => {
       const targetRole = (selectedRole || "Buyer").toLowerCase();
       window.location.href = `dashboard-${targetRole}.html`;

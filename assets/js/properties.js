@@ -213,45 +213,45 @@ function openQuickViewModal(propId) {
   modalOverlay.innerHTML = `
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-prop-title">
       <button class="modal-close-btn" aria-label="Close modal">✕</button>
-      <div style="position: relative; height: 320px; overflow: hidden; background: #000;">
-        <img src="${p.image}" alt="${p.title}" style="width: 100%; height: 100%; object-fit: cover;">
+      <div class="modal-media-header">
+        <img src="${p.image}" alt="${p.title}" class="modal-media-img">
         <div class="property-badge-group">
           <span class="badge ${p.status === "sale" ? "badge-sale" : "badge-rent"}">For ${p.status}</span>
           ${p.featured ? '<span class="badge badge-featured">Featured</span>' : ""}
         </div>
         <div class="property-price-tag">${p.priceDisplay}</div>
       </div>
-      <div style="padding: 2rem;">
+      <div class="modal-body">
         <div class="property-type">${p.type} • ${p.city}</div>
-        <h2 id="modal-prop-title" style="font-size: 1.6rem; font-weight: 700; color: var(--color-dark); margin: 0.25rem 0 0.75rem 0;">${p.title}</h2>
-        <div class="property-location" style="margin-bottom: 1.5rem;">
+        <h2 id="modal-prop-title" class="modal-prop-title">${p.title}</h2>
+        <div class="property-location modal-location">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
           <span>${p.address}, ${p.city}</span>
         </div>
-        <div class="property-specs" style="margin-bottom: 1.5rem;">
+        <div class="property-specs modal-specs">
           <div class="spec-item"><span><strong>${p.beds}</strong> Bedrooms</span></div>
           <div class="spec-item"><span><strong>${p.baths}</strong> Bathrooms</span></div>
           <div class="spec-item"><span><strong>${p.sqft}</strong> sqft Area</span></div>
           <div class="spec-item"><span><strong>${p.garage}</strong> Garage</span></div>
         </div>
-        <p style="color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.7; margin-bottom: 1.75rem;">${p.description}</p>
+        <p class="modal-description">${p.description}</p>
         
-        <h4 style="font-size: 1.1rem; font-weight: 700; color: var(--color-dark); margin-bottom: 0.75rem;">Premium Amenities</h4>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2rem;">
-          ${p.amenities.map((a) => `<span style="background: var(--color-bg-light); border: 1px solid var(--color-border); padding: 0.35rem 0.75rem; border-radius: 4px; font-size: 0.8125rem; font-weight: 500;">✓ ${a}</span>`).join("")}
+        <h4 class="modal-amenities-title">Premium Amenities</h4>
+        <div class="modal-amenities-list">
+          ${p.amenities.map((a) => `<span class="modal-amenity-pill">✓ ${a}</span>`).join("")}
         </div>
 
-        <div style="background: var(--color-bg-light); border: 1px solid var(--color-border); border-radius: var(--radius-md); padding: 1.5rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: gap: 1rem;">
-          <div style="display: flex; align-items: center; gap: 1rem;">
-            <img src="${p.agent.avatar}" alt="${p.agent.name}" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
-            <div>
-              <h5 style="font-weight: 700; color: var(--color-dark); font-size: 0.95rem;">${p.agent.name}</h5>
-              <p style="color: var(--color-text-muted); font-size: 0.8125rem;">${p.agent.role}</p>
+        <div class="modal-agent-card">
+          <div class="modal-agent-profile">
+            <img src="${p.agent.avatar}" alt="${p.agent.name}" class="modal-agent-avatar">
+            <div class="modal-agent-info">
+              <h5 class="modal-agent-name">${p.agent.name}</h5>
+              <p class="modal-agent-role">${p.agent.role}</p>
             </div>
           </div>
-          <div style="display: flex; gap: 0.75rem;">
-            <a href="404.html" class="btn btn-outline btn-sm action-404">Call Agent</a>
-            <a href="404.html" class="btn btn-primary btn-sm action-404">Schedule Visit</a>
+          <div class="modal-action-buttons">
+            <a href="404.html" class="btn btn-outline btn-sm action-404 modal-action-btn">Call Agent</a>
+            <a href="404.html" class="btn btn-primary btn-sm action-404 modal-action-btn">Schedule Visit</a>
           </div>
         </div>
       </div>

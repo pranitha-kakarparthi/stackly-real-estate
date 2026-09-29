@@ -28,7 +28,7 @@
           height="42"
         />
       </a>
-      <div style="display: flex; align-items: center; gap: 1rem">
+      <div class="auth-header-actions">
         <a href="index.html" class="auth-back-link">
           <svg
             width="16"
@@ -167,12 +167,10 @@
 
           <form id="signup-form" class="auth-form" novalidate>
             <!-- Names Row -->
-            <div
-              style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem"
-            >
+            <div class="auth-form-row">
               <div class="form-group">
                 <label for="signup-first-name" class="form-label">
-                  <span>First Name</span><span class="required">*</span>
+                  First Name <span class="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -184,7 +182,7 @@
               </div>
               <div class="form-group">
                 <label for="signup-last-name" class="form-label">
-                  <span>Last Name</span><span class="required">*</span>
+                  Last Name <span class="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -197,12 +195,10 @@
             </div>
 
             <!-- Username & Email Row -->
-            <div
-              style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 1rem"
-            >
+            <div class="auth-form-row">
               <div class="form-group">
                 <label for="signup-username" class="form-label">
-                  <span>Username</span><span class="required">*</span>
+                  Username <span class="required">*</span>
                 </label>
                 <input
                   type="text"
@@ -214,7 +210,7 @@
               </div>
               <div class="form-group">
                 <label for="signup-email" class="form-label">
-                  <span>Email Address</span><span class="required">*</span>
+                  Email Address <span class="required">*</span>
                 </label>
                 <input
                   type="email"
@@ -230,7 +226,7 @@
             <!-- Password with Strength Meter & Toggle -->
             <div class="form-group">
               <label for="signup-password" class="form-label">
-                <span>Password</span><span class="required">*</span>
+                Password <span class="required">*</span>
               </label>
               <div class="password-input-wrap">
                 <input
@@ -296,7 +292,7 @@
             <!-- Confirm Password -->
             <div class="form-group">
               <label for="signup-confirm-password" class="form-label">
-                <span>Confirm Password</span><span class="required">*</span>
+                Confirm Password <span class="required">*</span>
               </label>
               <div class="password-input-wrap">
                 <input
@@ -328,16 +324,10 @@
             </div>
 
             <!-- Role Selector & Split Mobile Phone Input -->
-            <div
-              style="
-                display: grid;
-                grid-template-columns: 1.1fr 1.3fr;
-                gap: 1rem;
-              "
-            >
+            <div class="auth-form-row">
               <div class="form-group">
                 <label for="signup-role" class="form-label">
-                  <span>Role / Register As</span><span class="required">*</span>
+                  Role / Register As <span class="required">*</span>
                 </label>
                 <select id="signup-role" class="form-select" required>
                   <option value="">Choose role...</option>
@@ -351,7 +341,7 @@
               <!-- Split Mobile Phone Input -->
               <div class="form-group">
                 <label for="signup-phone" class="form-label">
-                  <span>Mobile Number</span><span class="required">*</span>
+                  Mobile Number <span class="required">*</span>
                 </label>
                 <div class="phone-input-group">
                   <select

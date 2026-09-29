@@ -54,7 +54,9 @@
             <div class="nav-item">
               <a href="index.html" class="nav-link">Home</a>
             </div>
-            <div class="nav-item"><a href="properties.html" class="nav-link">Properties</a></div>
+            <div class="nav-item">
+              <a href="properties.html" class="nav-link">Properties</a>
+            </div>
             <div class="nav-item">
               <a href="about.html" class="nav-link active">About Us</a>
             </div>
@@ -91,7 +93,7 @@
         />
         <button class="mobile-close-btn" aria-label="Close menu">✕</button>
       </div>
-            <div class="mobile-menu-list">
+      <div class="mobile-menu-list">
         <a href="index.html" class="mobile-nav-link">Home</a>
         <a href="properties.html" class="mobile-nav-link">Properties</a>
         <a href="about.html" class="mobile-nav-link active">About Stackly</a>
@@ -134,7 +136,7 @@
       <!-- Section 2: Our Story & Salem Genesis (Unique property-10.webp) -->
       <section class="section">
         <div class="container">
-          <div class="grid-2" style="align-items: center; gap: 4rem">
+          <div class="grid-2 grid-gap-lg" style="align-items: center">
             <div>
               <span class="section-subtitle">Our Genesis</span>
               <h2 class="section-title">
@@ -167,7 +169,7 @@
                 published on our network. Today, we represent the region's most
                 iconic gated enclaves and commercial landmarks.
               </p>
-              <div style="display: flex; gap: 2rem">
+              <div style="display: flex; flex-wrap: wrap; gap: 1.5rem">
                 <div>
                   <strong
                     style="
@@ -354,12 +356,9 @@
             <h2 class="section-title">The Numbers Behind Our Credibility</h2>
           </div>
           <div
-            style="
-              display: grid;
-              grid-template-columns: repeat(4, 1fr);
-              gap: 2rem;
-              text-align: center;
-            "
+            class="grid-4"
+            data-aos="fade-up"
+            style="gap: 1.5rem; text-align: center"
           >
             <div
               style="
@@ -465,42 +464,121 @@
         </div>
       </section>
 
-            <!-- Architectural Innovation & Construction Craftsmanship Section -->
+      <!-- Architectural Innovation & Construction Craftsmanship Section -->
       <section class="section animate-scale">
         <div class="container">
           <div class="section-header">
             <span class="section-subtitle">Engineering &amp; Architecture</span>
-            <h2 class="section-title">Built On Structural Rigor &amp; Craftsmanship</h2>
-            <p class="section-desc">From our Salem headquarters to expansive Yercaud hill retreats, our projects define modern Tamil Nadu luxury living.</p>
+            <h2 class="section-title">
+              Built On Structural Rigor &amp; Craftsmanship
+            </h2>
+            <p class="section-desc">
+              From our Salem headquarters to expansive Yercaud hill retreats,
+              our projects define modern Tamil Nadu luxury living.
+            </p>
           </div>
 
-          <div class="grid-2" style="gap: 2.5rem; align-items: center;">
-            <div class="img-zoom-card" style="height: 380px; box-shadow: var(--shadow-xl); border: 2px solid #ffffff;">
-              <img src="assets/images/showcase/building1.webp" alt="Stackly Corporate Architecture" loading="lazy" style="height: 100%; object-fit: cover;">
+          <div class="grid-2" style="gap: 2.5rem; align-items: center">
+            <div
+              class="img-zoom-card"
+              style="
+                height: 380px;
+                box-shadow: var(--shadow-xl);
+                border: 2px solid #ffffff;
+              "
+            >
+              <img
+                src="assets/images/showcase/building1.webp"
+                alt="Stackly Corporate Architecture"
+                loading="lazy"
+                style="height: 100%; object-fit: cover"
+              />
             </div>
             <div>
-              <h3 style="font-size: 1.6rem; color: var(--color-dark); margin-bottom: 1rem; font-weight: 700;">Landmark Corporate &amp; Residential Developments</h3>
-              <p style="color: var(--color-text-muted); line-height: 1.7; margin-bottom: 1.25rem;">
-                Every Stackly development integrates high-grade seismic-resistant RCC frames, heat-reflective terracotta facade elements, and automated smart-grid electrical installations designed for longevity.
+              <h3
+                style="
+                  font-size: 1.6rem;
+                  color: var(--color-dark);
+                  margin-bottom: 1rem;
+                  font-weight: 700;
+                "
+              >
+                Landmark Corporate &amp; Residential Developments
+              </h3>
+              <p
+                style="
+                  color: var(--color-text-muted);
+                  line-height: 1.7;
+                  margin-bottom: 1.25rem;
+                "
+              >
+                Every Stackly development integrates high-grade
+                seismic-resistant RCC frames, heat-reflective terracotta facade
+                elements, and automated smart-grid electrical installations
+                designed for longevity.
               </p>
-              <ul style="list-style: none; padding: 0; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem;">
-                <li style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; color: var(--color-dark);">
-                  <span style="color: var(--color-primary); font-size: 1.1rem;">✓</span> 100% DTCP &amp; Tamil Nadu RERA Registered Assets
+              <ul
+                style="
+                  list-style: none;
+                  padding: 0;
+                  display: flex;
+                  flex-direction: column;
+                  gap: 0.75rem;
+                  margin-bottom: 2rem;
+                "
+              >
+                <li
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    font-weight: 600;
+                    color: var(--color-dark);
+                  "
+                >
+                  <span style="color: var(--color-primary); font-size: 1.1rem"
+                    >✓</span
+                  >
+                  100% DTCP &amp; Tamil Nadu RERA Registered Assets
                 </li>
-                <li style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; color: var(--color-dark);">
-                  <span style="color: var(--color-primary); font-size: 1.1rem;">✓</span> Sustainable Solar-Ready Rooftops &amp; Rainwater Harvesting
+                <li
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    font-weight: 600;
+                    color: var(--color-dark);
+                  "
+                >
+                  <span style="color: var(--color-primary); font-size: 1.1rem"
+                    >✓</span
+                  >
+                  Sustainable Solar-Ready Rooftops &amp; Rainwater Harvesting
                 </li>
-                <li style="display: flex; align-items: center; gap: 0.75rem; font-weight: 600; color: var(--color-dark);">
-                  <span style="color: var(--color-primary); font-size: 1.1rem;">✓</span> Institutional Handover with 10-Year Structural Warranty
+                <li
+                  style="
+                    display: flex;
+                    align-items: center;
+                    gap: 0.75rem;
+                    font-weight: 600;
+                    color: var(--color-dark);
+                  "
+                >
+                  <span style="color: var(--color-primary); font-size: 1.1rem"
+                    >✓</span
+                  >
+                  Institutional Handover with 10-Year Structural Warranty
                 </li>
               </ul>
-              <a href="404.html" class="btn btn-primary btn-shine action-404">Download Engineering Dossier (PDF)</a>
+              <a href="404.html" class="btn btn-primary btn-shine action-404"
+                >Download Engineering Dossier (PDF)</a
+              >
             </div>
           </div>
         </div>
       </section>
 
-<!-- Section 5: Executive Leadership & Senior Advisory Brokers (Unique portraits agent-5, agent-1, agent-2, agent-6)
+      <!-- Section 5: Executive Leadership & Senior Advisory Brokers (Unique portraits agent-5, agent-1, agent-2, agent-6)
          Action buttons redirect to 404 per requirement -->
       <section class="section">
         <div class="container">
