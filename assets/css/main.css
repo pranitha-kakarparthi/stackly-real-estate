@@ -747,6 +747,43 @@ ol {
 }
 
 /* ==========================================================================
+   HOMEPAGE HERO SECTION (Vibrant High-Visibility Background)
+   ========================================================================== */
+.hero-home-section {
+  position: relative;
+  overflow: hidden;
+  background-color: #0b0f19;
+  color: #ffffff;
+  padding: 7rem 0 4rem 0;
+}
+
+.hero-home-bg {
+  position: absolute;
+  inset: 0;
+  background: url("../images/properties/hero-banner.webp") center/cover
+    no-repeat;
+  opacity: 0.85;
+  z-index: 1;
+  transition: opacity var(--transition-normal);
+}
+
+.hero-home-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(15, 23, 42, 0.25) 0%,
+    rgba(27, 32, 50, 0.15) 100%
+  );
+  z-index: 2;
+}
+
+.hero-home-section .container {
+  position: relative;
+  z-index: 3;
+}
+
+/* ==========================================================================
    BREADCRUMB HERO (Sub-pages)
    ========================================================================== */
 .page-hero {

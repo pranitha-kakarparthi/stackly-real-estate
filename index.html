@@ -85,8 +85,12 @@
 
           <!-- Header Actions: Sign In (Secondary CTA) & Register (Primary CTA) -->
           <div class="header-actions">
-            <a href="pages/sign-in.html" class="btn btn-outline btn-sm">Sign In</a>
-            <a href="pages/sign-up.html" class="btn btn-primary btn-sm">Register</a>
+            <a href="pages/sign-in.html" class="btn btn-outline btn-sm"
+              >Sign In</a
+            >
+            <a href="pages/sign-up.html" class="btn btn-primary btn-sm"
+              >Register</a
+            >
             <button class="hamburger-btn" aria-label="Toggle mobile menu">
               <span></span>
               <span></span>
@@ -113,8 +117,12 @@
         <a href="index.html" class="mobile-nav-link active">Home</a>
         <a href="pages/properties.html" class="mobile-nav-link">Properties</a>
         <a href="pages/about.html" class="mobile-nav-link">About Stackly</a>
-        <a href="pages/services.html" class="mobile-nav-link">Advisory & Services</a>
-        <a href="pages/pricing.html" class="mobile-nav-link">Pricing Packages</a>
+        <a href="pages/services.html" class="mobile-nav-link"
+          >Advisory & Services</a
+        >
+        <a href="pages/pricing.html" class="mobile-nav-link"
+          >Pricing Packages</a
+        >
         <a href="pages/contact.html" class="mobile-nav-link">Contact Office</a>
       </div>
       <div class="mobile-drawer-footer">
@@ -135,21 +143,9 @@
          SECTION 1: HERO SECTION
          Action buttons redirect to 404 per requirement
          ========================================================================== -->
-      <section
-        class="section"
-        style="
-          padding: 7rem 0 4rem 0;
-          background:
-            linear-gradient(
-              135deg,
-              rgba(20, 24, 36, 0.92),
-              rgba(27, 32, 50, 0.85)
-            ),
-            url(&quot;assets/images/properties/hero-banner.webp&quot;)
-              center/cover no-repeat;
-          color: #ffffff;
-        "
-      >
+      <section class="section hero-home-section">
+        <div class="hero-home-bg" aria-hidden="true"></div>
+        <div class="hero-home-overlay" aria-hidden="true"></div>
         <div class="container" style="text-align: center; max-width: 900px">
           <span
             class="section-subtitle"
@@ -167,6 +163,7 @@
               font-weight: 800;
               line-height: 1.15;
               margin: 1.25rem 0 1.5rem 0;
+              text-shadow: 0 3px 14px rgba(0, 0, 0, 0.85);
             "
           >
             Find Your Dream Sanctuary <br /><span class="changing-text-rotator"
@@ -176,12 +173,13 @@
           <p
             style="
               font-size: 1.15rem;
-              color: #cbd5e1;
+              color: #f1f5f9;
               line-height: 1.7;
               margin-bottom: 2.25rem;
               max-width: 720px;
               margin-left: auto;
               margin-right: auto;
+              text-shadow: 0 2px 8px rgba(0, 0, 0, 0.85);
             "
           >
             Stackly connects discerning homeowners, investors, and developers
@@ -1124,7 +1122,9 @@
               </div>
 
               <div style="display: flex; gap: 1rem; flex-wrap: wrap">
-                <a href="pages/404.html" class="btn btn-primary btn-shine action-404"
+                <a
+                  href="pages/404.html"
+                  class="btn btn-primary btn-shine action-404"
                   >Discover More Landmarks ↗</a
                 >
                 <a href="pages/404.html" class="btn btn-outline"
@@ -2047,7 +2047,9 @@
             <a href="pages/404.html" class="btn btn-primary btn-lg action-404"
               >Schedule Consultation</a
             >
-            <a href="pages/404.html" class="btn btn-outline-primary btn-lg action-404"
+            <a
+              href="pages/404.html"
+              class="btn btn-outline-primary btn-lg action-404"
               >Call Our Desk</a
             >
           </div>
@@ -2153,15 +2155,25 @@
             <ul class="footer-links">
               <li><a href="index.html" class="footer-link">Home</a></li>
               <li>
-                <a href="pages/properties.html" class="footer-link">Properties</a>
-              </li>
-              <li><a href="pages/about.html" class="footer-link">About Us</a></li>
-              <li><a href="pages/services.html" class="footer-link">Services</a></li>
-              <li>
-                <a href="pages/pricing.html" class="footer-link">Pricing Plans</a>
+                <a href="pages/properties.html" class="footer-link"
+                  >Properties</a
+                >
               </li>
               <li>
-                <a href="pages/contact.html" class="footer-link">Contact Desk</a>
+                <a href="pages/about.html" class="footer-link">About Us</a>
+              </li>
+              <li>
+                <a href="pages/services.html" class="footer-link">Services</a>
+              </li>
+              <li>
+                <a href="pages/pricing.html" class="footer-link"
+                  >Pricing Plans</a
+                >
+              </li>
+              <li>
+                <a href="pages/contact.html" class="footer-link"
+                  >Contact Desk</a
+                >
               </li>
             </ul>
           </div>
