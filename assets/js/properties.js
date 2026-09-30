@@ -3,6 +3,16 @@
    Live Filtering, Quick-View Modal, Dynamic Card Rendering, EMI Calculator
    ========================================================================== */
 
+function getPathContext() {
+  const isInPages =
+    window.location.pathname.includes("/pages/") ||
+    window.location.pathname.includes("\\pages\\");
+  return {
+    assetPrefix: isInPages ? "../" : "",
+    pagePrefix: isInPages ? "" : "pages/",
+  };
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   initPropertyExplorer();
   initMortgageCalculator();
@@ -92,12 +102,14 @@ function initPropertyExplorer() {
 
     const favs = window.StacklyStore.getFavorites();
 
+    const { assetPrefix } = getPathContext();
+
     gridContainer.innerHTML = filtered
       .map(
         (p) => `
       <article class="property-card" data-id="${p.id}">
         <div class="property-thumb-wrap">
-          <img src="${p.image}" alt="${p.title}" class="property-thumb" loading="lazy" width="600" height="400">
+          <img src="${assetPrefix}${p.image}" alt="${p.title}" class="property-thumb" loading="lazy" width="600" height="400">
           <div class="property-badge-group">
             <span class="badge ${p.status === "sale" ? "badge-sale" : "badge-rent"}">For ${p.status}</span>
             ${p.featured ? '<span class="badge badge-featured">Featured</span>' : ""}
@@ -134,7 +146,7 @@ function initPropertyExplorer() {
           </div>
           <div class="property-footer">
             <div class="property-agent">
-              <img src="${p.agent.avatar}" alt="${p.agent.name}" class="agent-thumb" width="34" height="34">
+              <img src="${assetPrefix}${p.agent.avatar}" alt="${p.agent.name}" class="agent-thumb" width="34" height="34">
               <span class="agent-name">${p.agent.name}</span>
             </div>
             <button class="property-view-btn quick-view-trigger" data-id="${p.id}">
@@ -202,6 +214,8 @@ function openQuickViewModal(propId) {
   const p = props.find((item) => item.id === propId);
   if (!p) return;
 
+  const { assetPrefix, pagePrefix } = getPathContext();
+
   let modalOverlay = document.getElementById("property-quick-modal");
   if (!modalOverlay) {
     modalOverlay = document.createElement("div");
@@ -214,7 +228,7 @@ function openQuickViewModal(propId) {
     <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-prop-title">
       <button class="modal-close-btn" aria-label="Close modal">✕</button>
       <div class="modal-media-header">
-        <img src="${p.image}" alt="${p.title}" class="modal-media-img">
+        <img src="${assetPrefix}${p.image}" alt="${p.title}" class="modal-media-img">
         <div class="property-badge-group">
           <span class="badge ${p.status === "sale" ? "badge-sale" : "badge-rent"}">For ${p.status}</span>
           ${p.featured ? '<span class="badge badge-featured">Featured</span>' : ""}
@@ -243,15 +257,15 @@ function openQuickViewModal(propId) {
 
         <div class="modal-agent-card">
           <div class="modal-agent-profile">
-            <img src="${p.agent.avatar}" alt="${p.agent.name}" class="modal-agent-avatar">
+            <img src="${assetPrefix}${p.agent.avatar}" alt="${p.agent.name}" class="modal-agent-avatar">
             <div class="modal-agent-info">
               <h5 class="modal-agent-name">${p.agent.name}</h5>
               <p class="modal-agent-role">${p.agent.role}</p>
             </div>
           </div>
           <div class="modal-action-buttons">
-            <a href="404.html" class="btn btn-outline btn-sm action-404 modal-action-btn">Call Agent</a>
-            <a href="404.html" class="btn btn-primary btn-sm action-404 modal-action-btn">Schedule Visit</a>
+            <a href="${pagePrefix}404.html" class="btn btn-outline btn-sm action-404 modal-action-btn">Call Agent</a>
+            <a href="${pagePrefix}404.html" class="btn btn-primary btn-sm action-404 modal-action-btn">Schedule Visit</a>
           </div>
         </div>
       </div>
@@ -382,6 +396,7 @@ function initHeroSearchForm() {
     if (city !== "all") params.set("city", city);
     if (selectedStatus !== "all") params.set("status", selectedStatus);
 
-    window.location.href = `properties.html?${params.toString()}`;
+    const { pagePrefix } = getPathContext();
+    window.location.href = `${pagePrefix}properties.html?${params.toString()}`;
   });
 }
